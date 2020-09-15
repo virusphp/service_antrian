@@ -5,14 +5,14 @@ namespace App\Service\Bpjs;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\RequestException;
 
-class Referensi extends Bpjs
+class Bridging extends Bpjs
 {
     public function __construct($consid, $timestamp, $signature)
     {
         parent::__construct($consid, $timestamp, $signature);
     }
 
-    public function referensi($endpoint)
+    public function getRequest($endpoint)
     {
         try {
             $url = $this->bpjs_url . $endpoint;

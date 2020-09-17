@@ -37,9 +37,10 @@ class MonitoringController extends BpjsController
 
     public function JasaRaharja($tglAwal, $tglAkhir)
     {
-        $endpoint = "monitoring/HistoriPelayanan/NoKartu/" . $noKartu . "/tglAwal/" . $tglAwal . "/tglAkhir/" . $tglAkhir;
-        $klaim = $this->bpjs->getRequest($endpoint);
-        return $klaim;
+        $endpoint = "monitoring/JasaRaharja/tglMulai/" . $tglAwal . "/tglAkhir/" . $tglAkhir;
+        // dd($endpoint);
+        $jasaRaharja = $this->bpjs->getRequest($endpoint);
+        return $jasaRaharja;
 
     }
 }

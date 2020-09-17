@@ -52,5 +52,7 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
     $router->get('/monitoring/historipelayanan/nokartu/{noKartu}/tglawal/{tglAwal}/tglakhir/{tglAkhir}', 'MonitoringController@History');
     $router->get('/monitoring/jasaraharja/tglawal/{tglAwal}/tglakhir/{tglAkhir}', 'MonitoringController@JasaRaharja');
 
+    // ---------------------- SEP ---------------------------------//
+    $router->get('/sep/{noSep}', 'SepController@CariSep');
 
 });

@@ -26,4 +26,34 @@ class Bridging extends Bpjs
             }
         } 
     }
+
+    public function postRequest($endpoint, $data)
+    {
+        $data = file_get_contents("php://input");
+        try {
+            $url = $this->api_url . $endpoint;
+            $result = $this->client->post($url, ['headers' => $this->headers, 'body' => $data]);
+            return $result;
+        } catch (RequestException $e) {
+            $result = Psr7\str($e->getRequest());
+            if ($e->hasResponse()) {
+                $result = Psr7\str($e->getResponse());
+            }
+        } 
+    }
+
+    public function putRequest($endpoint, $data)
+    {
+        $data = file_get_contents("php://input");
+        try {
+            $url = $this->api_url . $endpoint;
+            $result = $this->client->put($url, ['headers' => $this->headers, 'body' => $data]);
+            return $result;
+        } catch (RequestException $e) {
+            $result = Psr7\str($e->getRequest());
+            if ($e->hasResponse()) {
+                $result = Psr7\str($e->getResponse());
+            }
+        } 
+    }
 }

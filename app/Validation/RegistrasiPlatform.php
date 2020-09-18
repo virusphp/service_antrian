@@ -2,16 +2,16 @@
 
 namespace App\Validation;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class RegistrasiPlatform
 {
     public function rules($request)
     {
-        return $this->validate($request,[
+        return Validator::make($request->all(),[
             'name' => 'required',
-            'username' => 'required|min:5|unique:access,username',
-            'email' => 'required|min:5|unique:access,email',
+            'username' => 'required|min:5|unique:access_platform,username',
+            'email' => 'required|min:5|unique:access_platform,email',
             'password' => 'required',
             'repassword' => 'required|same:password|min:6',
             'phone' => 'required|min:10',

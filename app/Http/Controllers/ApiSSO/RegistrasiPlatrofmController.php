@@ -18,21 +18,14 @@ class RegistrasiPlatrofmController extends Controller
         $this->transform = new TransformAccess;
     }
 
-    public function Register(Request $r)
+    public function Register(Request $r, RegistrasiPlatform $valid)
     {
-        $this->validate($r,[
-            'name' => 'required',
-            'username' => 'required|min:5|unique:access_platform,username',
-            'email' => 'required|min:5|unique:access_platform,email',
-            'password' => 'required',
-            'repassword' => 'required|same:password|min:6',
-            'phone' => 'required|min:10'
-        ]);
+        $validate = $valid->rules($r);
 
-        // if ($validate->fails()) {
-        //     $message = $valid->messages($validate->errors());
-        //     return response()->jsonApi(422, "Error Require Form", $message);    
-        // }
+        if ($validate->fails()) {
+            $message = $valid->messages($validate->errors());
+            return response()->jsonApi(422, "Error Require Form", $message);    
+        }
 
         $access = $this->access->save($r);
 

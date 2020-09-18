@@ -19,7 +19,7 @@ class TableAccessPlatform extends Migration
             $table->string('username')->unique();
             $table->string('password');
             $table->string('company');
-            $table->string('no_hp')->nullable();
+            $table->string('phone')->nullable();
             $table->string('scope')->nullable();
             $table->string('api_token')->nullable();
             $table->timestamp('token_expired')->nullable();

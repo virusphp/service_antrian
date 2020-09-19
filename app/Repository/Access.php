@@ -38,4 +38,29 @@ class Access
             return $e->getMessage();
         }
     }
+
+    public function checkAccess($params)
+    {
+        return DB::table('access_platform')
+            ->select('company','username','email', 'password')
+            ->where('username', $params['username'])
+            ->first();
+    }
+
+    public function checkAccessApi($token)
+    {
+        return DB::table('access_platform')
+            ->select('company','username','email')
+            ->where('api_token', $token)
+            ->first();
+    }
+
+    public function profileAccess($params)
+    {
+        return DB::table('access_platform')
+            ->select('company','email','username','phone','api_token')
+            ->where('username', '=', $params['username'])
+            ->first();
+    }
+  
 }

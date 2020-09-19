@@ -15,14 +15,18 @@ $router->get('/', function () {
     return view('welcome.api');
 });
 
-// ----------------- REGISTRASI ACCESS
-// $router->group(['namespace'  => 'ApiSSO'], function() use ($router) {
-    $router->post('/access/register', 'ApiSSO\RegistrasiPlatrofmController@Register');
-    // $router->post('/access/register', function() {
-        // return "OBO OPO IJO";
-    // });
-// });
+// ----------------- REGISTRASI ACCESS SSO MULTI APP BY SCOPE
+$router->group(['namespace'  => 'ApiSSO'], function() use ($router) {
+    $router->post('/access/register', 'RegistrasiPlatrofmController@Register');
+    $router->post('/access/login', 'LoginPlatformController@Login');
+});
 
+// ------------------- REGISTRASI POLIKLINIK MULTI PLATFORM
+$router->group(['namespace' => 'ApiSIMRS', 'middleware' => 'bpjs'], function() use ($router) {
+    $router->get('/registrasi/via/bpjs', 'AntrianController@Register');
+});
+
+// ----------------------- API BPJS FROM INTERNAL
 $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
     // ----------------- REFERENSI --------------------------//
     $router->get('/referensi/diagnosa/{kode}', 'ReferensiController@diagnosa');

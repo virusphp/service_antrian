@@ -4,8 +4,14 @@ namespace App\Http\Middleware;
 use Closure;
 use App\Repository\Access;
 
-class CorsMiddleware
+class BpjsMiddleware
 {
+    protected $access;
+
+    public function __construct()
+    {
+        $this->access = new Access;
+    }
     /**
      * Handle an incoming request.
      *
@@ -26,6 +32,16 @@ class CorsMiddleware
         if ($request->isMethod('OPTIONS'))
         {
             return response()->json('{"method":"OPTIONS"}', 200, $headers);
+        }
+
+        if(!$request->hasHeader('X-Token')) {
+            return response()->jsonApiBpjs(401, "Unautorized", ['messageError' => 'Need Token to Access this URL!']);
+        }
+
+        $token = $request->header('X-Token');
+        $accessPlatform = $this->access->checkAccessApi($token);
+        if (!$accessPlatform) {
+            return response()->jsonApiBpjs(402, "Not Matching", "Token tidak sesuai");
         }
 
         $response = $next($request);

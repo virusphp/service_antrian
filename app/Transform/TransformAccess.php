@@ -19,4 +19,17 @@ class TransformAccess
         return $data;
     }
 
+    public function mapLogin($table)
+    {
+        $data = [
+            'company' => $table->company,
+            'username' => $table->username,
+            'email' => $table->email,
+            'phone' => $table->phone,
+            'token' => $table->api_token
+        ];
+
+        return $data;
+    }
+
 }

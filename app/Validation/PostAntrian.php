@@ -4,17 +4,20 @@ namespace App\Validation;
 
 use Illuminate\Support\Facades\Validator;
 
-class RegistrasiPlatform
+class PostAntrian
 {
     public function rules($request)
     {
         return Validator::make($request->all(),[
-            'name' => 'required',
-            'username' => 'required|min:5|unique:access_platform,username',
-            'email' => 'required|min:5|unique:access_platform,email',
-            'password' => 'required',
-            'repassword' => 'required|same:password|min:6',
-            'phone' => 'required|min:10',
+            'nomorkartu' => 'required',
+            'nik' => 'required',
+            'notelp' => 'required',
+            'tanggalperiksa' => 'required',
+            'kodepoli' => 'required',
+            'nomorreferensi' => 'required',
+            'jenisreferensi' => 'required',
+            'jenisrequest' => 'required',
+            'polieksekutif' => 'required',
         ]);
     }
 

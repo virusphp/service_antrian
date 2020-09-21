@@ -2,11 +2,11 @@
 
 return [
 
-   'default' => 'SQL_SSO',
+   'default' => 'sql_sso',
    'migrations' => 'migrations',
 
    'connections' => [
-        'SQL_SSO' => [
+        'sql_sso' => [
             'driver'   => 'sqlsrv',
             'host'     => env('DB_HOST', '0.0.0.0'),
             'database' => env('DB_DATABASE', 'forge'),
@@ -15,7 +15,7 @@ return [
             'charset'  => env('DB_CHARSET', 'utf8'),
             'prefix'   => env('DB_PREFIX', ''),
         ],
-        'SQL_SIMRS' => [
+        'sql_simrs' => [
             'driver'   => 'sqlsrv',
             'host'     => env('DB_HOST', '0.0.0.0'),
             'database' => env('DB_DATABASE_DUA', 'forge'),
@@ -24,7 +24,7 @@ return [
             'charset'  => env('DB_CHARSET', 'utf8'),
             'prefix'   => env('DB_PREFIX', ''),
         ],
-        'SQL_ABSEN' => [
+        'sql_absesn' => [
             'driver'   => 'sqlsrv',
             'host'     => env('DB_HOST', '0.0.0.0'),
             'database' => env('DB_DATABASE_DUA', 'forge'),

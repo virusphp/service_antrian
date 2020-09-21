@@ -27,7 +27,7 @@ class AntrianController extends Controller
         }
 
         $antrian = $this->antrian->postAntrian($r);
-        dd($antrian);
+        return $antrian;
 
     }
 }

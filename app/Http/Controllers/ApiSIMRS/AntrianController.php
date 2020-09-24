@@ -23,11 +23,16 @@ class AntrianController extends Controller
 
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonApi(422, "Error Require Form", $message);    
+            return response()->jsonApiBpjs(422, "Error Require Form", $message);    
         }
 
-        $antrian = $this->antrian->postAntrian($r);
-        return $antrian;
+        $result = $this->antrian->postAntrian($r);
+        if ($result['code'] == 200) {
+            unset($result['code']);
+            return response()->jsonApiBpjs(200, "Sukses Registrasi", $result);
+        }
+
+        return response()->jsonApiBpjs(201, "Error Proses Insert", $result);
 
     }
 }

@@ -17,7 +17,7 @@ class Bridging extends Bpjs
         try {
             $url = $this->bpjs_url . $endpoint;
             $response = $this->client->get($url, ['headers' => $this->header]);
-            $result = $response->getBody();
+            $result = $response->getBody()->getContents();
             return $result;
         } catch (RequestException $e) {
             $result = Psr7\str($e->getRequest());

@@ -63,32 +63,79 @@ class Antrian
             $rajal = $this->saveRajal($noReg, $params, $statusPengunjung, $dataPasien);
 
             if ($rajal['code'] == 200) {
-                $res['code'] = 200;
-                $res['nomorantrean'] = "";
-                $res['kodebooking'] = "";
-                $res['jenisantrean'] = 2;
-                $res['estimasidilayani'] = 212381923;
-                $res['namapoli'] = "POLI DALAM";
-                $res['namadokter'] = "dr. HISYAM";
-                return $res;
+                $tagihan = $this->saveTagihan($rajal, $noReg, $params, $dataPasien, $kodePenjamin);
+                $nomorAntrian = $this->getAntrian($params->tanggalperiksa, $rajal['kd_sub_unit']);
+
+                if ($tagihan['code'] == 200) {
+                    $res['code'] = 200;
+                    $res['nomorantrean'] = $nomorAntrian;
+                    $res['kodebooking'] = $tagihan['kode_booking'];
+                    $res['jenisantrean'] = 2;
+                    $res['estimasidilayani'] = 212381923;
+                    $res['namapoli'] = $tagihan['nama_poli'];
+                    $res['namadokter'] = $rajal['nama_dokter'];
+                    return $res;
+                }
             }
-        
         }
+    }
 
-        // // ---- TABEL RAWAT JALAN
-        // $data->kd_sub_unit = $dataPoli->kd_sub_unit;
-        // $data->kd_cara_kunjungan = 1;
-        // $data->status_kunjungan  = 1;
-        // $data->waktu_anamnesa    = date('H:i:s');
-        // $data->kd_dokter  = "KODE DOKTER"; 
-        // $data->reg_sms  = 3;
+    private function saveTagihan($dataRajal, $noReg, $params, $dataPasien, $kodePenjamin)
+    {
+        $noBukti = $this->getNoBukti($params->tanggalperiksa);
+        $tarif = $this->getTarif($dataRajal['kd_sub_unit']);
+        // dd($noBukti, $dataPasien->no_rm, $noReg, $params->tanggalperiksa, $dataRajal['kd_sub_unit'],$kodePenjamin, 
+        // $tarif->idx, $tarif->kd_tarif,$tarif->nama_tarif,$tarif->kd_klp_biaya,$tarif->kd_kelas,$tarif->kd_level,
+        // $tarif->ba,$tarif->js,$tarif->jp,$tarif->anastesi,$tarif->anastesi_cito,$dataRajal['kd_dokter']);
 
-        // $data->no_rujukan =  $params->jenisreferensi;
-        // $data->jenis_rujukan =  $params->jenisreferensi;
-        // $data->poli_eksekutif =  $params->polieksekutif;
-        // $data->nik = $params->nik;
-        // $data->no_telp = $params->notelp;
-        // dd($data);
+        $tagihan = DB::connection($this->dbsimrs)->table('tagihan_pasien')
+        ->insert([
+            'no_bukti' => $noBukti,
+            'no_RM' => $dataPasien->no_rm,
+            'no_reg' => $noReg,
+            'tgl_tagihan' => $params->tanggalperiksa,
+            'kd_sub_unit' => $dataRajal['kd_sub_unit'],
+            'kd_sub_unit_asal' => $dataRajal['kd_sub_unit'],
+            'kd_penjamin' => $kodePenjamin,
+            'idx' => $tarif->idx,
+            'kd_tarif' => $tarif->kd_tarif,
+            'nama_tarif' => $tarif->nama_tarif,
+            'kd_klp_biaya' => $tarif->kd_klp_biaya,
+            'kd_kelas' => $tarif->kd_kelas,
+            'kd_level' => $tarif->kd_level,
+            'hak_kelas' => 3,
+            'ba' => $tarif->ba,
+            'js' => $tarif->js,
+            'jp' => $tarif->jp,
+            'anastesi' => $tarif->anastesi,
+            'anastesi_cito' => $tarif->anastesi_cito,
+            'harga' => $tarif->harga,
+            'jumlah' => 1,
+            'harga' => $tarif->harga,
+            'biaya_jaminan' => $tarif->harga,
+            'tunai' => 0,
+            'piutang' => $tarif->harga,
+            'tagihan' => $tarif->harga,
+            'kd_dokter' => $dataRajal['kd_dokter'],
+            'kd_dokter_anastesi' => '-',
+            'Asisten_Anastesi' => '-',
+            'Asisten_Operasi' => '-',
+            'status_bayar' => 'BELUM',
+            'user_id' => '00000',
+            'tgl_insert' => Carbon::now(),
+            'Status_Tagihan' => '1',
+            'Rek_P' => $tarif->rek_p
+        ]);
+
+        if (!$tagihan) {
+            $res['code'] = 201;
+            $res['message'] = "Registrasi poli gagal terjadi kesalahan sistem";
+            return $res;
+        }
+        $res['code'] = 200;
+        $res['kode_booking'] = $noBukti;
+        $res['nama_poli'] = $tarif->nama_sub_unit;
+        return $res;
     }
 
     private function saveRajal($noReg, $params, $statusKunjungan, $dataPasien)
@@ -119,8 +166,55 @@ class Antrian
             return $res;
         }
         $res['code'] = 200;
-        $res['message'] = "Registrasi Rajat Jalan Sukses!";
+        $res['kd_sub_unit'] = $dokterPoli->kd_sub_unit;
+        $res['kd_dokter'] = $dokterPoli->kd_pegawai;
+        $res['nama_dokter'] = $dokterPoli->nama_pegawai;
         return $res;
+    }
+
+    private function getAntrian($tanggal, $kodePoli)
+    {
+        $nomorAntrian = DB::connection($this->dbsimrs)->table('rawat_jalan AS RJ')
+                        ->join('registrasi AS R', function($join) {
+                            $join->on('RJ.no_reg','=', 'R.no_reg');
+                        })
+                        ->select('RJ.no_reg','RJ.no_RM','R.status_keluar','R.waktu','R.tgl_reg','RJ.kd_poliklinik') 
+                        ->where('RJ.kd_poliklinik', '=', $kodePoli)
+                        ->where('R.tgl_reg', '=', $tanggal)
+                        ->get();
+        $nomorAntrian = $nomorAntrian->count();
+        return $nomorAntrian;
+    }
+
+    private function getTarif($subUnit)
+    {
+        $dataTarif = DB::connection($this->dbsimrs)->table('tarif_karcis_rj as tkr')->select(
+            'tkr.kd_sub_unit','tkr.nama_sub_unit','tkr.harga','tkr.rek_p','tkr.kd_tarif','tkr.nama_tarif',
+            'tkr.ba','tkr.js','tkr.jp','t.idx','t.kd_klp_biaya','t.kd_kelas','t.kd_level','t.anastesi',
+            't.anastesi_cito'
+        )
+        ->join('sub_unit as s', function($join) {
+            $join->on('tkr.kd_sub_unit', '=', 's.kd_sub_unit')
+                ->where('s.enabled', '=', 1); 
+        })
+        ->join('tarif as t', function($join){
+            $join->on('tkr.kd_tarif','=','t.kd_tarif');
+        })
+        ->where('tkr.kd_sub_unit', '=', $subUnit)
+        ->first();
+        return $dataTarif;
+    }
+
+    private function getNoBukti($tanggal)
+    {
+        $nomorBukti = "IRJ". date('dmy', strtotime($tanggal));
+        $noTagihan = DB::connection($this->dbsimrs)->table('tagihan_pasien')
+                    ->where('no_bukti', 'like', $nomorBukti .'%')
+                    ->max('no_bukti');
+        $urutTagihan = (int) substr($noTagihan, -4);
+        $urutTagihan++;
+        $newTagihan = $nomorBukti . sprintf("%04s", $urutTagihan);
+        return $newTagihan;
     }
 
     private function getKodePenjamin($nomorKartu, $tanggal)
@@ -186,8 +280,10 @@ class Antrian
 
     private function getDokterPoli($kodePoli, $tanggal)
     {
-        return DB::connection($this->dbsimrs)->table('jadwal_dokter_poli_rj as j')->select('j.kd_sub_unit','j.kd_pegawai')
+        return DB::connection($this->dbsimrs)->table('jadwal_dokter_poli_rj as j')
+                ->select('j.kd_sub_unit','j.kd_pegawai', 'p.nama_pegawai')
                 ->join('sub_unit as s', 'j.kd_sub_unit', '=', 's.kd_sub_unit')
+                ->join('pegawai as p', 'j.kd_pegawai', '=', 'p.kd_pegawai')
                 ->where([
                     ['s.kd_poli_dpjp', $kodePoli],
                     ['j.kd_hari', Waktu::tanggalToNilai($tanggal)]

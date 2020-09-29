@@ -32,6 +32,7 @@ class AntrianController extends Controller
             return response()->jsonApiBpjs(200, "Sukses Registrasi", $result);
         }
 
+        unset($result['code']);
         return response()->jsonApiBpjs(201, "Error Proses Insert", $result);
 
     }

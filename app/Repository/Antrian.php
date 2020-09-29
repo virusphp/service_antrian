@@ -31,69 +31,75 @@ class Antrian
     private function simpanRegistrasi($params)
     {
         $dataPasien = $this->getDataPasien($params->nomorkartu);
-        // dd($dataPasien);
         if ($dataPasien == null) {
             $res['code']  = 201;
-            $res['pesan'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
+            $res['error'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
             return $res;
         }
+
+        $dokterPoli = $this->getDokterPoli($params->kodepoli, $params->tanggalperiksa);
+        if ($dokterPoli == null) {
+            $res['code']  = 201;
+            $res['error'] = "Poli tujuan yang terpilih salah!!!";
+            return $res;
+        }
+       
         $noReg             = $this->generateNomor($params->tanggalperiksa);
         $dataPasien->waktu = date('H:i:s');
         $asalPasien        = $this->asalPasien($params->jenisreferensi, $params->nomorreferensi);
         $statusPengunjung   = $this->getStatusPengunjung($dataPasien->no_rm);
         $kodePenjamin      = $this->getKodePenjamin($params->nomorkartu, $params->tanggalperiksa);
-        // dd($noReg, $dataPasien->no_rm, $params->tanggalperiksa, $dataPasien->waktu, $asalPasien, $statusPengunjung, $kodePenjamin);
 
-        $saveRegister = DB::connection($this->dbsimrs)->table('registrasi')->insert([
-            'no_reg' => $noReg,
-            'no_RM' => $dataPasien->no_rm,
-            'tgl_reg' => $params->tanggalperiksa,
-            'waktu' => $dataPasien->waktu,
-            'kd_asal_pasien' => $asalPasien,
-            'status_pengunjung' => $statusPengunjung,
-            'kd_cara_bayar' => 8,
-            'jenis_pasien' => 0,
-            'no_reg_pembayar' => $noReg,
-            'kd_penjamin' => $kodePenjamin,
-            'no_SJP' => '-',
-            'user_id' => '0000000'
-        ]);
-
-        if ($saveRegister) {
-            $rajal = $this->saveRajal($noReg, $params, $statusPengunjung, $dataPasien);
-
-            if ($rajal['code'] == 200) {
+        DB::beginTransaction();
+        try{
+            $saveRegister = DB::connection($this->dbsimrs)->table('registrasi')->insert([
+                'no_reg' => $noReg,
+                'no_RM' => $dataPasien->no_rm,
+                'tgl_reg' => $params->tanggalperiksa,
+                'waktu' => $dataPasien->waktu,
+                'kd_asal_pasien' => $asalPasien,
+                'status_pengunjung' => $statusPengunjung,
+                'kd_cara_bayar' => 8,
+                'jenis_pasien' => 0,
+                'no_reg_pembayar' => $noReg,
+                'kd_penjamin' => $kodePenjamin,
+                'no_SJP' => '-',
+                'user_id' => '0000000'
+            ]);
+    
+            if ($saveRegister) {
+                $rajal = $this->saveRajal($noReg, $dokterPoli, $statusPengunjung, $dataPasien);
                 $tagihan = $this->saveTagihan($rajal, $noReg, $params, $dataPasien, $kodePenjamin);
                 $rujukan = $this->saveRujukan($noReg, $dataPasien->no_rm, $params);
                 $updateTelepon = $this->putTelepon($dataPasien->no_rm, $params->notelp);
+                $estimasidilayani = $this->getEstimasi($params->tanggalperiksa);
                 $nomorAntrian = $this->getAntrian($noReg, $params->tanggalperiksa, $rajal['kd_sub_unit']);
 
-                if ($tagihan['code'] == 200) {
-                    $res['code'] = 200;
-                    $res['nomorantrean'] = $nomorAntrian;
-                    $res['kodebooking'] = $tagihan['kode_booking'];
-                    $res['jenisantrean'] = 2;
-                    $res['estimasidilayani'] = 212381923;
-                    $res['namapoli'] = $tagihan['nama_poli'];
-                    $res['namadokter'] = $rajal['nama_dokter'];
-                    return $res;
-                }
+                $res['code'] = 200;
+                $res['nomorantrean'] = $nomorAntrian;
+                $res['kodebooking'] = $noReg;
+                $res['jenisantrean'] = 2;
+                $res['estimasidilayani'] = $estimasidilayani;
+                $res['namapoli'] = $tagihan['nama_poli'];
+                $res['namadokter'] = $rajal['nama_dokter'];
+                DB::commit();
+            } else {
+                DB::rollback();
                 $res['code']  = 201;
-                $res['pesan'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
-                return $res;
+                $res['error'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
             }
-            $res['code']  = 201;
-            $res['pesan'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
-            return $res;
+        } catch (Exception $e) {
+            DB::rollback();
+            $res['code'] = 201;
+            $res['error'] = 'Registrasi gagal silahkan cek kembali data anda! ' . $e->getMessage();
         }
-        $res['code']  = 201;
-        $res['pesan'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
+        
         return $res;
     }
 
     private function saveRujukan($noReg, $noRm, $params)
     {
-        $rujukan = DB::table('Rujukan')->insert([
+        $rujukan = DB::connection($this->dbsimrs)->table('rujukan')->insert([
             'no_rujukan' => "-",
             'no_reg' => $noReg,
             'tgl_rujukan' => $params->tanggalperiksa,
@@ -150,27 +156,15 @@ class Antrian
             'Rek_P' => $tarif->rek_p
         ]);
 
-        if (!$tagihan) {
-            $res['code'] = 201;
-            $res['message'] = "Registrasi poli gagal terjadi kesalahan sistem";
-            return $res;
-        }
         $res['code'] = 200;
         $res['kode_booking'] = $noBukti;
         $res['nama_poli'] = $tarif->nama_sub_unit;
         return $res;
     }
 
-    private function saveRajal($noReg, $params, $statusKunjungan, $dataPasien)
+    private function saveRajal($noReg, $dokterPoli, $statusKunjungan, $dataPasien)
     {
-        $dokterPoli = $this->getDokterPoli($params->kodepoli, $params->tanggalperiksa);
         $waktuAnamnesa = date("Y-m-d h:i:s");
-        
-        if (empty($dokterPoli)) {
-            $res['code'] = 201;
-            $res['message'] = "Dokter tujuan libur / Poli terpilih tutup!";
-            return $res;
-        }
 
         $rawatJalan = DB::connection($this->dbsimrs)->table('rawat_jalan')->insert([
             'no_reg' => $noReg,
@@ -183,16 +177,17 @@ class Antrian
             'reg_sms' => 3
         ]);
 
-        if (!$rawatJalan) {
-            $res['code'] = 201;
-            $res['message'] = "Registrasi poli gagal terjadi kesalahan sistem";
-            return $res;
-        }
         $res['code'] = 200;
         $res['kd_sub_unit'] = $dokterPoli->kd_sub_unit;
         $res['kd_dokter'] = $dokterPoli->kd_pegawai;
         $res['nama_dokter'] = $dokterPoli->nama_pegawai;
         return $res;
+    }
+
+    private function getEstimasi($tanggal)
+    {
+        $estimasi = $tanggal." 08:00:00";
+        return strtotime($estimasi);
     }
 
     private function putTelepon($noRm, $noTelp)
@@ -217,7 +212,7 @@ class Antrian
             'no_antrian' => $nomorAntrian,
             'kd_poliklinik' => $kodePoli
         ]);
-        
+
         return $nomorAntrian;
     }
 

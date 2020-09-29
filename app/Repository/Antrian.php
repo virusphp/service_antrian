@@ -64,7 +64,9 @@ class Antrian
 
             if ($rajal['code'] == 200) {
                 $tagihan = $this->saveTagihan($rajal, $noReg, $params, $dataPasien, $kodePenjamin);
-                $nomorAntrian = $this->getAntrian($params->tanggalperiksa, $rajal['kd_sub_unit']);
+                $rujukan = $this->saveRujukan($noReg, $dataPasien->no_rm, $params);
+                $updateTelepon = $this->putTelepon($dataPasien->no_rm, $params->notelp);
+                $nomorAntrian = $this->getAntrian($noReg, $params->tanggalperiksa, $rajal['kd_sub_unit']);
 
                 if ($tagihan['code'] == 200) {
                     $res['code'] = 200;
@@ -76,8 +78,29 @@ class Antrian
                     $res['namadokter'] = $rajal['nama_dokter'];
                     return $res;
                 }
+                $res['code']  = 201;
+                $res['pesan'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
+                return $res;
             }
+            $res['code']  = 201;
+            $res['pesan'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
+            return $res;
         }
+        $res['code']  = 201;
+        $res['pesan'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
+        return $res;
+    }
+
+    private function saveRujukan($noReg, $noRm, $params)
+    {
+        $rujukan = DB::table('Rujukan')->insert([
+            'no_rujukan' => "-",
+            'no_reg' => $noReg,
+            'tgl_rujukan' => $params->tanggalperiksa,
+            'no_RM' => $noRm
+        ]);
+
+        return $rujukan;
     }
 
     private function saveTagihan($dataRajal, $noReg, $params, $dataPasien, $kodePenjamin)
@@ -172,7 +195,12 @@ class Antrian
         return $res;
     }
 
-    private function getAntrian($tanggal, $kodePoli)
+    private function putTelepon($noRm, $noTelp)
+    {
+        return DB::connection($this->dbsimrs)->table('pasien')->where('no_rm', '=', $noRm)->update(['no_telp' => $noTelp]);
+    }
+
+    private function getAntrian($noReg, $tanggal, $kodePoli)
     {
         $nomorAntrian = DB::connection($this->dbsimrs)->table('rawat_jalan AS RJ')
                         ->join('registrasi AS R', function($join) {
@@ -183,6 +211,13 @@ class Antrian
                         ->where('R.tgl_reg', '=', $tanggal)
                         ->get();
         $nomorAntrian = $nomorAntrian->count();
+
+        $saveAntrian = DB::connection($this->dbsimrs)->table('antrian')->insert([
+            'no_reg' => $noReg,
+            'no_antrian' => $nomorAntrian,
+            'kd_poliklinik' => $kodePoli
+        ]);
+        
         return $nomorAntrian;
     }
 

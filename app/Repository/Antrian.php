@@ -24,7 +24,6 @@ class Antrian
         } catch (Exception $e) {
             $e->getMessage();
         }
-
     }
 
     // --- TABEL REGISTRASI
@@ -43,11 +42,22 @@ class Antrian
             $res['error'] = "Poli tujuan yang terpilih salah!!!";
             return $res;
         }
+
+        $checkRegister = $this->checkRegister($dataPasien->no_rm, $params->tanggalperiksa, $dokterPoli->kd_sub_unit);
+        if ($checkRegister)
+        {
+            $res['code']  = 201;
+            $res['error'] = "Pasien dengan pembayaran Bpjs/Asuransi lain hanya dapat mendaftar 1 x perhari!!";
+            return $res;
+        }
        
-        $noReg             = $this->generateNomor($params->tanggalperiksa);
         $dataPasien->waktu = date('H:i:s');
+        $tarif             = $this->getTarif($dokterPoli->kd_sub_unit);
+        $noBukti           = $this->getNoBukti($params->tanggalperiksa);
+        $estimasidilayani  = $this->getEstimasi($params->tanggalperiksa);
+        $noReg             = $this->generateNomor($params->tanggalperiksa);
+        $statusPengunjung  = $this->getStatusPengunjung($dataPasien->no_rm);
         $asalPasien        = $this->asalPasien($params->jenisreferensi, $params->nomorreferensi);
-        $statusPengunjung   = $this->getStatusPengunjung($dataPasien->no_rm);
         $kodePenjamin      = $this->getKodePenjamin($params->nomorkartu, $params->tanggalperiksa);
 
         DB::beginTransaction();
@@ -67,34 +77,33 @@ class Antrian
                 'user_id' => '0000000'
             ]);
     
-            if ($saveRegister) {
-                $rajal = $this->saveRajal($noReg, $dokterPoli, $statusPengunjung, $dataPasien);
-                $tagihan = $this->saveTagihan($rajal, $noReg, $params, $dataPasien, $kodePenjamin);
-                $rujukan = $this->saveRujukan($noReg, $dataPasien->no_rm, $params);
+            if (!$saveRegister) {
+                DB::rollback();
+                $res['code']  = 201;
+                $res['error'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
+            } else {
+                $rajal         = $this->saveRajal($noReg, $dokterPoli, $statusPengunjung, $dataPasien);
+                $tagihan       = $this->saveTagihan($noBukti, $dokterPoli, $tarif, $noReg, $params, $dataPasien, $kodePenjamin);
+                $rujukan       = $this->saveRujukan($noReg, $dataPasien->no_rm, $params);
+                $nomorAntrian  = $this->getAntrian($noReg, $params->tanggalperiksa, $dokterPoli->kd_sub_unit);
                 $updateTelepon = $this->putTelepon($dataPasien->no_rm, $params->notelp);
-                $estimasidilayani = $this->getEstimasi($params->tanggalperiksa);
-                $nomorAntrian = $this->getAntrian($noReg, $params->tanggalperiksa, $rajal['kd_sub_unit']);
 
                 $res['code'] = 200;
                 $res['nomorantrean'] = $nomorAntrian;
                 $res['kodebooking'] = $noReg;
                 $res['jenisantrean'] = 2;
                 $res['estimasidilayani'] = $estimasidilayani;
-                $res['namapoli'] = $tagihan['nama_poli'];
-                $res['namadokter'] = $rajal['nama_dokter'];
-                DB::commit();
-            } else {
-                DB::rollback();
-                $res['code']  = 201;
-                $res['error'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
+                $res['namapoli'] = $tarif->nama_sub_unit;
+                $res['namadokter'] = $dokterPoli->nama_pegawai;
             }
+            DB::commit();
+            return $res;
         } catch (Exception $e) {
             DB::rollback();
             $res['code'] = 201;
             $res['error'] = 'Registrasi gagal silahkan cek kembali data anda! ' . $e->getMessage();
+            return $res;
         }
-        
-        return $res;
     }
 
     private function saveRujukan($noReg, $noRm, $params)
@@ -109,22 +118,16 @@ class Antrian
         return $rujukan;
     }
 
-    private function saveTagihan($dataRajal, $noReg, $params, $dataPasien, $kodePenjamin)
+    private function saveTagihan($noBukti, $dokterPoli, $tarif, $noReg, $params, $dataPasien, $kodePenjamin)
     {
-        $noBukti = $this->getNoBukti($params->tanggalperiksa);
-        $tarif = $this->getTarif($dataRajal['kd_sub_unit']);
-        // dd($noBukti, $dataPasien->no_rm, $noReg, $params->tanggalperiksa, $dataRajal['kd_sub_unit'],$kodePenjamin, 
-        // $tarif->idx, $tarif->kd_tarif,$tarif->nama_tarif,$tarif->kd_klp_biaya,$tarif->kd_kelas,$tarif->kd_level,
-        // $tarif->ba,$tarif->js,$tarif->jp,$tarif->anastesi,$tarif->anastesi_cito,$dataRajal['kd_dokter']);
-
-        $tagihan = DB::connection($this->dbsimrs)->table('tagihan_pasien')
+        return DB::connection($this->dbsimrs)->table('tagihan_pasien')
         ->insert([
             'no_bukti' => $noBukti,
             'no_RM' => $dataPasien->no_rm,
             'no_reg' => $noReg,
             'tgl_tagihan' => $params->tanggalperiksa,
-            'kd_sub_unit' => $dataRajal['kd_sub_unit'],
-            'kd_sub_unit_asal' => $dataRajal['kd_sub_unit'],
+            'kd_sub_unit' => $dokterPoli->kd_sub_unit,
+            'kd_sub_unit_asal' => $dokterPoli->kd_sub_unit,
             'kd_penjamin' => $kodePenjamin,
             'idx' => $tarif->idx,
             'kd_tarif' => $tarif->kd_tarif,
@@ -145,7 +148,7 @@ class Antrian
             'tunai' => 0,
             'piutang' => $tarif->harga,
             'tagihan' => $tarif->harga,
-            'kd_dokter' => $dataRajal['kd_dokter'],
+            'kd_dokter' => $dokterPoli->kd_pegawai,
             'kd_dokter_anastesi' => '-',
             'Asisten_Anastesi' => '-',
             'Asisten_Operasi' => '-',
@@ -155,18 +158,13 @@ class Antrian
             'Status_Tagihan' => '1',
             'Rek_P' => $tarif->rek_p
         ]);
-
-        $res['code'] = 200;
-        $res['kode_booking'] = $noBukti;
-        $res['nama_poli'] = $tarif->nama_sub_unit;
-        return $res;
     }
 
     private function saveRajal($noReg, $dokterPoli, $statusKunjungan, $dataPasien)
     {
         $waktuAnamnesa = date("Y-m-d h:i:s");
 
-        $rawatJalan = DB::connection($this->dbsimrs)->table('rawat_jalan')->insert([
+        return DB::connection($this->dbsimrs)->table('rawat_jalan')->insert([
             'no_reg' => $noReg,
             'no_rm' => $dataPasien->no_rm,
             'kd_poliklinik' => $dokterPoli->kd_sub_unit,
@@ -176,12 +174,22 @@ class Antrian
             'kd_dokter' => $dokterPoli->kd_pegawai,
             'reg_sms' => 3
         ]);
+    }
 
-        $res['code'] = 200;
-        $res['kd_sub_unit'] = $dokterPoli->kd_sub_unit;
-        $res['kd_dokter'] = $dokterPoli->kd_pegawai;
-        $res['nama_dokter'] = $dokterPoli->nama_pegawai;
-        return $res;
+    private function checkRegister($noRm, $tanggal, $kdPoli)
+    {
+        return DB::connection($this->dbsimrs)->table('registrasi as r')
+                    ->select('r.no_reg','r.no_rm','rj.kd_poliklinik','r.kd_cara_bayar','r.tgl_reg')
+                    ->join('rawat_jalan as rj', 'r.no_reg', '=', 'rj.no_reg')
+                    ->where([
+                        ['r.tgl_reg', '=', $tanggal],
+                        ['r.no_rm', '=', $noRm]
+                    ])
+                    ->where(function($query){
+                        $query->where('r.kd_cara_bayar', '=', 8)
+                                ->orWhere('r.kd_cara_bayar', '=', 3);
+                    })
+                    ->first();
     }
 
     private function getEstimasi($tanggal)

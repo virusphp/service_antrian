@@ -4,19 +4,13 @@ namespace App\Validation;
 
 use Illuminate\Support\Facades\Validator;
 
-class PostAntrian
+class PostRekap
 {
     public function rules($request)
     {
         return Validator::make($request->all(),[
-            'nomorkartu' => 'required',
-            'nik' => 'required',
-            'notelp' => 'required',
             'tanggalperiksa' => 'required|date',
             'kodepoli' => 'required',
-            'nomorreferensi' => 'required',
-            'jenisreferensi' => 'required',
-            'jenisrequest' => 'required',
             'polieksekutif' => 'required',
         ]);
     }

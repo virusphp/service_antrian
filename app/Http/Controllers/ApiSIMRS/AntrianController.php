@@ -17,6 +17,7 @@ class AntrianController extends Controller
         $this->antrian = new Antrian;
         $this->transform = new TransformAntrian;
     }
+
     public function Register(Request $r, PostAntrian $valid)
     {
         $validate = $valid->rules($r);
@@ -34,6 +35,25 @@ class AntrianController extends Controller
 
         unset($result['code']);
         return response()->jsonApiBpjs(201, "Error Proses Insert", $result);
+    }
 
+    public function getRekapAntrian(Request $r, PostRekap $valid)
+    {
+        $validate = $valid->rules($r);
+
+        if ($validate->fails()) {
+            $message = $valid->messages($validate->errors());
+            return response()->jsonApiBpjs(422, "Error Require Form", $message);    
+        }
+
+        $result = $this->antrian->postRekap($r);
+
+        if ($result['code'] == 200) {
+            unset($result['code']);
+            return response()->jsonApiBpjs(200, "Sukses", $result);
+        }
+
+        unset($result['code']);
+        return response()->jsonApiBpjs(201, "Pencarian Tidak ditemukan ", $result);
     }
 }

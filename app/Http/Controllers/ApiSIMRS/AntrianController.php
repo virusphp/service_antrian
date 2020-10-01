@@ -7,6 +7,7 @@ use App\Transform\TransformAntrian;
 use Illuminate\Http\Request;
 use App\Repository\Antrian;
 use App\Validation\PostAntrian;
+use App\Validation\PostRekap;
 
 class AntrianController extends Controller
 {
@@ -28,6 +29,7 @@ class AntrianController extends Controller
         }
 
         $result = $this->antrian->postAntrian($r);
+        
         if ($result['code'] == 200) {
             unset($result['code']);
             return response()->jsonApiBpjs(200, "Sukses Registrasi", $result);
@@ -47,7 +49,7 @@ class AntrianController extends Controller
         }
 
         $result = $this->antrian->postRekap($r);
-
+        dd($result);
         if ($result['code'] == 200) {
             unset($result['code']);
             return response()->jsonApiBpjs(200, "Sukses", $result);

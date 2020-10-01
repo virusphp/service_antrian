@@ -26,6 +26,24 @@ class Antrian
         }
     }
 
+    public function postRekap($params)
+    {
+        $postRekap = $this->getRekap($params);
+
+        return $postRekap;
+    }
+
+    private function getRekap($params)
+    {
+        $dokterPoli = $this->getDokterPoli($params->kodepoli, $params->tanggalperiksa);
+
+        return DB::connection($this->dbsimrs)->table('rawat_jalan')
+            ->where([
+                'kd_poliklinik' => $dokterPoli->kd_sub_unit,
+                'waktu_anamnesa' => $params->tanggalperiksa,
+            ])->get();
+    }
+
     // --- TABEL REGISTRASI
     private function simpanRegistrasi($params)
     {

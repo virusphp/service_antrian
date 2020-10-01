@@ -23,7 +23,8 @@ $router->group(['namespace'  => 'ApiSSO'], function() use ($router) {
 
 // ------------------- REGISTRASI POLIKLINIK MULTI PLATFORM
 $router->group(['namespace' => 'ApiSIMRS', 'middleware' => 'bpjs'], function() use ($router) {
-    $router->get('/registrasi/via/bpjs', 'AntrianController@Register');
+    $router->post('/antrian/registrasi/via/bpjs', 'AntrianController@Register');
+    $router->post('/antrian/getrekap', 'AntrianController@getRekapAntrian');
 });
 
 // ----------------------- API BPJS FROM INTERNAL

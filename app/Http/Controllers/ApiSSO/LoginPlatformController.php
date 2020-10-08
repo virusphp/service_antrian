@@ -43,15 +43,21 @@ class LoginPlatformController extends Controller
             $message = [
                 "messageError" => "Password tidak cocok silahkan ulangi!"
             ];
-            return response()->jsonApiBpjs(403, "Passowrd not match!", $message);
+            if($access->scope=="bpdjateng"){
+                return response()->jsonApiBPD(403, "Passowrd not match!", $message);
+            }else{
+                return response()->jsonApiBpjs(403, "Passowrd not match!", $message);
+            }
         } 
 
         $access = $this->access->profileAccess($data);
 
         $transform = $this->transform->mapLogin($access);
         // dd($transform);
-
-        return response()->jsonApiBpjs(200, "Login Success!", $transform);
-       
+        if($access->scope=="bpdjateng"){
+            return response()->jsonApiBPD(200, "Login Success!", $transform);
+        }else {
+            return response()->jsonApiBpjs(200, "Login Success!", $transform);
+        }
     }
 }

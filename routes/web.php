@@ -69,3 +69,8 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
     $router->get('/sep/{noSep}', 'SepController@CariSep');
 
 });
+
+// ----------------- API BRIDGING BANK JATENG
+$router->group(['namespace'  => 'BridgingBankJateng', 'middleware' => 'bankjateng'], function() use ($router) {
+    $router->get('/tagihanpasien/{noRM}', 'BankJatengController@tagihanPasien');
+});

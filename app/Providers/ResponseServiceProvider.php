@@ -41,5 +41,15 @@ class ResponseServiceProvider extends ServiceProvider
             return $factory->make($format);
         });
 
+        $factory->macro('jsonApiBPD', function($code = 200, $message = '', $data = null) use ($factory) {
+            $format = [
+                'code' => $code,
+                'message' => $message,
+                'result' => $data
+            ];
+
+            return $factory->make($format);
+        });
+
     }
 }

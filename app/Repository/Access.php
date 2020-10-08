@@ -42,7 +42,7 @@ class Access
     public function checkAccess($params)
     {
         return DB::table('access_platform')
-            ->select('company','username','email', 'password')
+            ->select('company','username','email', 'password','scope')
             ->where('username', $params['username'])
             ->first();
     }
@@ -58,7 +58,7 @@ class Access
     public function profileAccess($params)
     {
         return DB::table('access_platform')
-            ->select('company','email','username','phone','api_token')
+            ->select('company','email','username','phone','api_token','scope')
             ->where('username', '=', $params['username'])
             ->first();
     }

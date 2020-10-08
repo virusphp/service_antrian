@@ -9,4 +9,3 @@ class Waktu
         return date("N", strtotime($tanggal)) + 1;
     }
 }
-

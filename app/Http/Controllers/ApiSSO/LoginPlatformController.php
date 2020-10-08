@@ -36,16 +36,21 @@ class LoginPlatformController extends Controller
             $message = [
                 "messageError" => "Username tidak di temukan!"
             ];
-            return response()->jsonApiBpjs(201, "User not found!", $message);
+            if ($access->scope == "bpdjateng") {
+                return response()->jsonApiBPD(201, "User not found!", $message);
+            } else {
+                return response()->jsonApiBpjs(201, "User not found!", $message);
+            }
         }
 
         if (!Hash::check($data['password'], $access->password)) {
             $message = [
                 "messageError" => "Password tidak cocok silahkan ulangi!"
             ];
-            if($access->scope=="bpdjateng"){
+
+            if ($access->scope=="bpdjateng"){
                 return response()->jsonApiBPD(403, "Passowrd not match!", $message);
-            }else{
+            } else {
                 return response()->jsonApiBpjs(403, "Passowrd not match!", $message);
             }
         } 
@@ -54,9 +59,9 @@ class LoginPlatformController extends Controller
 
         $transform = $this->transform->mapLogin($access);
         // dd($transform);
-        if($access->scope=="bpdjateng"){
+        if ($access->scope=="bpdjateng"){
             return response()->jsonApiBPD(200, "Login Success!", $transform);
-        }else {
+        } else {
             return response()->jsonApiBpjs(200, "Login Success!", $transform);
         }
     }

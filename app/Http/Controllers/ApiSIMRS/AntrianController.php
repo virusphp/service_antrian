@@ -49,7 +49,7 @@ class AntrianController extends Controller
         }
 
         $result = $this->antrian->postRekap($r);
-        dd($result);
+
         if ($result['code'] == 200) {
             unset($result['code']);
             return response()->jsonApiBpjs(200, "Sukses", $result);

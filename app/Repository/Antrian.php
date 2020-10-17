@@ -28,20 +28,65 @@ class Antrian
 
     public function postRekap($params)
     {
-        $postRekap = $this->getRekap($params);
+        $postRekap = $this->getRekapAntrian($params);
 
         return $postRekap;
     }
 
-    private function getRekap($params)
+    private function getRekapAntrian($params)
     {
         $dokterPoli = $this->getDokterPoli($params->kodepoli, $params->tanggalperiksa);
+        if ($dokterPoli == null) {
+            $res['code']  = 201;
+            $res['error'] = "Poli tujuan yang terpilih salah!!!";
+            return $res;
+        }
+        // dd($dokterPoli);
+        $rekap = $this->getRekap($dokterPoli->kd_sub_unit, $params->tanggalperiksa); 
+        if ($rekap->count() == 0) {
+            $res['code']  = 201;
+            $res['error'] = "Poli Tersebut belum ada antrian!!";
+            return $res;
+        }
 
+        $jumlah = $this->getJumlah($dokterPoli->kd_sub_unit, $params->tanggalperiksa);
+        if ($jumlah->count() == 0) {
+            $res['code']  = 201;
+            $res['error'] = "Poli Tersebut belum ada antrian!!";
+            return $res;
+        }
+        
+        $tarif = $this->getTarif($dokterPoli->kd_sub_unit);
+
+        $res['code'] = 200;
+        $res['namapoli'] = $tarif->nama_sub_unit;
+        $res['totalantrean'] = $rekap->count();
+        $res['jumlahterlayani'] = $jumlah->count();
+        $res['lastupdate'] = time();
+
+        return $res;
+    }
+
+    private function getJumlah($kdPoli, $tanggalPeriksa)
+    {
         return DB::connection($this->dbsimrs)->table('rawat_jalan')
-            ->where([
-                'kd_poliklinik' => $dokterPoli->kd_sub_unit,
-                'waktu_anamnesa' => $params->tanggalperiksa,
-            ])->get();
+                ->join('registrasi', 'rawat_jalan.no_reg','=', 'registrasi.no_reg')
+                ->where([
+                    'rawat_jalan.kd_poliklinik' => $kdPoli,
+                    'registrasi.tgl_reg' => $tanggalPeriksa,
+                    'rawat_jalan.pemeriksaan_dokter' => '1'
+                ])->get();
+    }
+
+    private function getRekap($kdPoli, $tanggalPeriksa)
+    {
+        return DB::connection($this->dbsimrs)
+        ->table('rawat_jalan')
+        ->join('registrasi', 'rawat_jalan.no_reg','=', 'registrasi.no_reg')
+        ->where([
+            'rawat_jalan.kd_poliklinik' => $kdPoli,
+            'registrasi.tgl_reg' => $tanggalPeriksa
+        ])->get();
     }
 
     // --- TABEL REGISTRASI
@@ -104,7 +149,7 @@ class Antrian
                 $tagihan       = $this->saveTagihan($noBukti, $dokterPoli, $tarif, $noReg, $params, $dataPasien, $kodePenjamin);
                 $rujukan       = $this->saveRujukan($noReg, $dataPasien->no_rm, $params);
                 $nomorAntrian  = $this->getAntrian($noReg, $params->tanggalperiksa, $dokterPoli->kd_sub_unit);
-                $updateTelepon = $this->putTelepon($dataPasien->no_rm, $params->notelp);
+                $updateTelepon = $this->putTelepon($dataPasien->no_rm, $params->notelp, $params->nik);
 
                 $res['code'] = 200;
                 $res['nomorantrean'] = $nomorAntrian;
@@ -216,9 +261,13 @@ class Antrian
         return strtotime($estimasi);
     }
 
-    private function putTelepon($noRm, $noTelp)
+    private function putTelepon($noRm, $noTelp, $nik)
     {
-        return DB::connection($this->dbsimrs)->table('pasien')->where('no_rm', '=', $noRm)->update(['no_telp' => $noTelp]);
+        return DB::connection($this->dbsimrs)->table('pasien')->where('no_rm', '=', $noRm)
+                  ->update([
+                      'no_telp' => $noTelp,
+                      'nik' => $nik
+                      ]);
     }
 
     private function getAntrian($noReg, $tanggal, $kodePoli)

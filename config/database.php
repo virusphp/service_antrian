@@ -24,10 +24,10 @@ return [
             'charset'  => env('DB_CHARSET', 'utf8'),
             'prefix'   => env('DB_PREFIX', ''),
         ],
-        'sql_absesn' => [
+        'sql_absen' => [
             'driver'   => 'sqlsrv',
             'host'     => env('DB_HOST', '0.0.0.0'),
-            'database' => env('DB_DATABASE_DUA', 'forge'),
+            'database' => env('DB_DATABASE_TIGA', 'forge'),
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'charset'  => env('DB_CHARSET', 'utf8'),

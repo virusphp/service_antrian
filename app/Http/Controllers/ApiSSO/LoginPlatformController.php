@@ -36,11 +36,8 @@ class LoginPlatformController extends Controller
             $message = [
                 "messageError" => "Username tidak di temukan!"
             ];
-            if ($access->scope == "bpdjateng") {
-                return response()->jsonApiBPD(201, "User not found!", $message);
-            } else {
-                return response()->jsonApiBpjs(201, "User not found!", $message);
-            }
+        
+            return response()->jsonApiBpjs(201, "User not found!", $message);
         }
 
         if (!Hash::check($data['password'], $access->password)) {

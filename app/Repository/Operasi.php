@@ -26,7 +26,6 @@ class Operasi
                     ['jo.status_proses', 0],
                 ])->get();
 
-
             return $listOperasi;
             
         } catch(Exception $e) {
@@ -34,28 +33,26 @@ class Operasi
         }
     }
 
-    public function checkAccess($params)
+    public function postJadwal($params)
     {
-        return DB::table('access_platform')
-            ->select('company','username','email', 'password','scope')
-            ->where('username', $params['username'])
-            ->first();
-    }
+        try {
+            $listJadwal = DB::table('dbsimrm.dbo.jadwal_operasi as jo')->select(
+                    'jo.no_jadwal_ok','jo.tgl_tindakan','jto.nama_jenis_tindakan_operasi','su.kd_poli_dpjp',
+                    'pb.nama','jo.status_proses','pp.no_kartu'
+                )
+                ->join('dbsimrs.dbo.pegawai as p', 'jo.kd_dokter','=', 'p.kd_pegawai')
+                ->join('dbsimrm.dbo.jenis_tindakan_operasi as jto', 'jo.kd_jenis_tindakan_operasi', '=', 'jto.kd_jenis_tindakan_operasi')
+                ->leftJoin('dbsimrs.dbo.sub_unit as su', 'p.kd_sub_unit', '=', 'su.kd_sub_unit')
+                ->join('dbsimrs.dbo.poli_bpjs as pb', 'su.kd_poli_dpjp','=', 'pb.kode')
+                ->join('dbsimrs.dbo.penjamin_pasien as pp', 'jo.no_rm','=','pp.no_rm')
+                ->whereBetween('jo.tgl_tindakan', [$params->tanggalawal, $params->tanggalakhir])
+                ->get();
 
-    public function checkAccessApi($token)
-    {
-        return DB::table('access_platform')
-            ->select('company','username','email')
-            ->where('api_token', $token)
-            ->first();
-    }
+            return $listJadwal;
 
-    public function profileAccess($params)
-    {
-        return DB::table('access_platform')
-            ->select('company','email','username','phone','api_token','scope')
-            ->where('username', '=', $params['username'])
-            ->first();
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
     }
   
 }

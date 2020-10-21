@@ -26,6 +26,7 @@ $router->group(['namespace' => 'ApiSIMRS', 'middleware' => 'bpjs'], function() u
     $router->post('/antrian/registrasi/via/bpjs', 'AntrianController@Register');
     $router->post('/antrian/getrekap', 'AntrianController@getRekapAntrian');
     $router->post('/operasi/getoperasi', 'OperationController@getOperasi');
+    $router->post('/operasi/getjadwal', 'OperationController@getJadwal');
 });
 
 // ----------------------- API BPJS FROM INTERNAL

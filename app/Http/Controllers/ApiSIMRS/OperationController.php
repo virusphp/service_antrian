@@ -28,36 +28,18 @@ class OperationController extends Controller
             return response()->jsonApiBpjs(422, "Error Require Form", $message);    
         }
 
-
         $result = $this->operasi->postOperasi($r);
-        dd($result);
         
-        if ($result['code'] == 200) {
-            unset($result['code']);
-            return response()->jsonApiBpjs(200, "Sukses Registrasi", $result);
+        if (!$result->count()) {
+            $message = [
+                "messageError" => "Perserta tidak mempunyai riwayat operasi!"
+            ];
+            return response()->jsonApiBpjs(201, "Data Tidak ada!", $message);
         }
 
-        unset($result['code']);
-        return response()->jsonApiBpjs(201, "Error Proses Insert", $result);
+        $transform = $this->transform->mapOperasi($result);
+
+        return response()->jsonApiBpjs(200, "OK", $transform);
     }
-
-    public function getRekapAntrian(Request $r, PostListOperasi $valid)
-    {
-        $validate = $valid->rules($r);
-
-        if ($validate->fails()) {
-            $message = $valid->messages($validate->errors());
-            return response()->jsonApiBpjs(422, "Error Require Form", $message);    
-        }
-
-        $result = $this->operasi->postRekap($r);
-
-        if ($result['code'] == 200) {
-            unset($result['code']);
-            return response()->jsonApiBpjs(200, "Sukses", $result);
-        }
-
-        unset($result['code']);
-        return response()->jsonApiBpjs(201, "Pencarian Tidak ditemukan ", $result);
-    }
+   
 }

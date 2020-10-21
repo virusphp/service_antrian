@@ -12,28 +12,22 @@ class Operasi
 {
     public function postOperasi($params)
     {
-        dd($params->all());
         try {
-            $access = DB::table('access_platform')->insert([
-                'company' => $params->name,
-                'username' => $params->username,
-                'email' => $params->email,
-                'password' => Hash::make($params->password),
-                'phone' => $params->phone,
-                'api_token' => BPJSHelper::signature($params->username, $params->password),
-                'created_at' => Carbon::now(),
-            ]);
+            $listOperasi = DB::table('dbsimrm.dbo.jadwal_operasi as jo')->select(
+                    'jo.no_jadwal_ok','jo.tgl_tindakan','jto.nama_jenis_tindakan_operasi','su.kd_poli_dpjp','pb.nama','jo.status_proses'
+                )
+                ->join('dbsimrs.dbo.pegawai as p', 'jo.kd_dokter','=', 'p.kd_pegawai')
+                ->join('dbsimrm.dbo.jenis_tindakan_operasi as jto', 'jo.kd_jenis_tindakan_operasi', '=', 'jto.kd_jenis_tindakan_operasi')
+                ->leftJoin('dbsimrs.dbo.sub_unit as su', 'p.kd_sub_unit', '=', 'su.kd_sub_unit')
+                ->join('dbsimrs.dbo.poli_bpjs as pb', 'su.kd_poli_dpjp','=', 'pb.kode')
+                ->join('dbsimrs.dbo.penjamin_pasien as pp', 'jo.no_rm','=','pp.no_rm')
+                ->where([
+                    ['pp.no_kartu', $params->nopeserta],
+                    ['jo.status_proses', 0],
+                ])->get();
 
-            if (!$access) {
-                return response()->jsonApi(500, "Error Transaction", "Error proses insert data!");
-            }
 
-            $access = DB::table('access_platform')
-                        ->select('company', 'username','email','api_token','created_at','updated_at')
-                        ->where('username', $params->username)
-                        ->first();
-
-            return $access;
+            return $listOperasi;
             
         } catch(Exception $e) {
             return $e->getMessage();

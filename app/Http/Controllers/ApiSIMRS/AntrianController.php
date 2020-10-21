@@ -32,7 +32,7 @@ class AntrianController extends Controller
         
         if ($result['code'] == 200) {
             unset($result['code']);
-            return response()->jsonApiBpjs(200, "Sukses Registrasi", $result);
+            return response()->jsonApiBpjs(200, "OK", $result);
         }
 
         unset($result['code']);
@@ -52,7 +52,7 @@ class AntrianController extends Controller
 
         if ($result['code'] == 200) {
             unset($result['code']);
-            return response()->jsonApiBpjs(200, "Sukses", $result);
+            return response()->jsonApiBpjs(200, "OK", $result);
         }
 
         unset($result['code']);

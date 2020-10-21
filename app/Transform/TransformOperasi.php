@@ -4,32 +4,21 @@ namespace App\Transform;
 
 class TransformOperasi
 {
-    public function mapRegister($table)
+    public function mapOperasi($table)
     {
-        $data["access"] = [
-                'nama'       => $table->company,
-                'email'      => $table->email,
-                'username'   => $table->username,
-                'created_at' => $table->created_at,
-                'updated_at' => $table->updated_at,
-        ];
-
-        $data["api_token"] = $table->api_token;
+        foreach ($table as $value) {
+            $data["list"][] = [
+                    'kodebooking'    => $value->no_jadwal_ok,
+                    'tanggaloperasi' => $value->tgl_tindakan,
+                    'jenistindakan'  => $value->nama_jenis_tindakan_operasi,
+                    'kodepoli'       => $value->kd_poli_dpjp,
+                    'namapoli'       => $value->nama,
+                    'terlaksana'     => $value->status_proses,
+            ];
+        }
 
         return $data;
     }
 
-    public function mapLogin($table)
-    {
-        $data = [
-            'company' => $table->company,
-            'username' => $table->username,
-            'email' => $table->email,
-            'phone' => $table->phone,
-            'token' => $table->api_token
-        ];
-
-        return $data;
-    }
 
 }

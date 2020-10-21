@@ -21,9 +21,11 @@ class ResponseServiceProvider extends ServiceProvider
     {
         $factory->macro('jsonApi', function($code = 200, $message = '', $data = null) use ($factory) {
             $format = [
-                'code' => $code,
-                'message' => $message,
-                'result' => $data
+                'metadata' => [
+                    'code' => $code,
+                    'message' => $message
+                ],
+                'response' => $data
             ];
 
             return $factory->make($format);

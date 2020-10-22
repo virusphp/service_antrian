@@ -34,7 +34,7 @@ class OperationController extends Controller
             $message = [
                 "messageError" => "Perserta tidak mempunyai riwayat operasi!"
             ];
-            return response()->jsonApiBpjs(201, "Data Tidak ada!", $message);
+            return response()->jsonApiBpjs(201, "Peserta tidka mempunyai riwayat operasi!", $message);
         }
 
         $transform = $this->transform->mapOperasi($result);
@@ -57,7 +57,7 @@ class OperationController extends Controller
             $message = [
                 "messageError" => "Perserta tidak mempunyai riwayat operasi!"
             ];
-            return response()->jsonApiBpjs(201, "Data Tidak ada!", $message);
+            return response()->jsonApiBpjs(201, "Peserta tidak mempunyai riwayat operasi!", $message);
         }
 
         $transform = $this->transform->mapJadwal($result);

@@ -29,14 +29,16 @@ class AntrianController extends Controller
         }
 
         $result = $this->antrian->postAntrian($r);
+        // dd($result);
         
         if ($result['code'] == 200) {
             unset($result['code']);
             return response()->jsonApiBpjs(200, "OK", $result);
         }
+        
 
         unset($result['code']);
-        return response()->jsonApiBpjs(201, "Error Proses Insert", $result);
+        return response()->jsonApiBpjs(201, $result['messageError'], $result);
     }
 
     public function getRekapAntrian(Request $r, PostRekap $valid)
@@ -56,6 +58,6 @@ class AntrianController extends Controller
         }
 
         unset($result['code']);
-        return response()->jsonApiBpjs(201, "Pencarian Tidak ditemukan ", $result);
+        return response()->jsonApiBpjs(201, $result['messageError'], $result);
     }
 }

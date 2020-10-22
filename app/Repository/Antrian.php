@@ -38,21 +38,21 @@ class Antrian
         $dokterPoli = $this->getDokterPoli($params->kodepoli, $params->tanggalperiksa);
         if ($dokterPoli == null) {
             $res['code']  = 201;
-            $res['error'] = "Poli tujuan yang terpilih salah!!!";
+            $res['messageError'] = "Poli tujuan yang terpilih salah!!!";
             return $res;
         }
         // dd($dokterPoli);
         $rekap = $this->getRekap($dokterPoli->kd_sub_unit, $params->tanggalperiksa); 
         if ($rekap->count() == 0) {
             $res['code']  = 201;
-            $res['error'] = "Poli Tersebut belum ada antrian!!";
+            $res['messageError'] = "Poli Tersebut belum ada antrian!!";
             return $res;
         }
 
         $jumlah = $this->getJumlah($dokterPoli->kd_sub_unit, $params->tanggalperiksa);
         if ($jumlah->count() == 0) {
             $res['code']  = 201;
-            $res['error'] = "Poli Tersebut belum ada antrian!!";
+            $res['messageError'] = "Poli Tersebut belum ada antrian!!";
             return $res;
         }
         
@@ -95,14 +95,14 @@ class Antrian
         $dataPasien = $this->getDataPasien($params->nomorkartu);
         if ($dataPasien == null) {
             $res['code']  = 201;
-            $res['error'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
+            $res['messageError'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
             return $res;
         }
 
         $dokterPoli = $this->getDokterPoli($params->kodepoli, $params->tanggalperiksa);
         if ($dokterPoli == null) {
             $res['code']  = 201;
-            $res['error'] = "Poli tujuan yang terpilih salah!!!";
+            $res['messageError'] = "Poli tujuan yang terpilih salah!!!";
             return $res;
         }
 
@@ -110,7 +110,7 @@ class Antrian
         if ($checkRegister)
         {
             $res['code']  = 201;
-            $res['error'] = "Pasien dengan pembayaran Bpjs/Asuransi lain hanya dapat mendaftar 1 x perhari!!";
+            $res['messageError'] = "Pasien dengan pembayaran Bpjs/Asuransi lain hanya dapat mendaftar 1 x perhari!!";
             return $res;
         }
        
@@ -122,6 +122,7 @@ class Antrian
         $statusPengunjung  = $this->getStatusPengunjung($dataPasien->no_rm);
         $asalPasien        = $this->asalPasien($params->jenisreferensi, $params->nomorreferensi);
         $kodePenjamin      = $this->getKodePenjamin($params->nomorkartu, $params->tanggalperiksa);
+        // dd($kodePenjamin, $asalPasien);
 
         DB::beginTransaction();
         try{
@@ -143,7 +144,7 @@ class Antrian
             if (!$saveRegister) {
                 DB::rollback();
                 $res['code']  = 201;
-                $res['error'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
+                $res['messageError'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
             } else {
                 $rajal         = $this->saveRajal($noReg, $dokterPoli, $statusPengunjung, $dataPasien);
                 $tagihan       = $this->saveTagihan($noBukti, $dokterPoli, $tarif, $noReg, $params, $dataPasien, $kodePenjamin);
@@ -164,7 +165,7 @@ class Antrian
         } catch (Exception $e) {
             DB::rollback();
             $res['code'] = 201;
-            $res['error'] = 'Registrasi gagal silahkan cek kembali data anda! ' . $e->getMessage();
+            $res['messageError'] = 'Registrasi gagal silahkan cek kembali data anda! ' . $e->getMessage();
             return $res;
         }
     }

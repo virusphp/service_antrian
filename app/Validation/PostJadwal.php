@@ -16,12 +16,12 @@ class PostJadwal
 
     public function messages($errors)
     {
-        $error = [];
-        foreach($errors->getMessages() as $key => $value)
-        {
-                $error[$key] = $value[0];
-        }
-        return $error;
+        // $error = [];
+        // foreach($errors->getMessages() as $key => $value)
+        // {
+        //         $error[$key] = $value[0];
+        // }
+        return $errors;
         
     }
 }

@@ -21,24 +21,25 @@ class AntrianController extends Controller
 
     public function Register(Request $r, PostAntrian $valid)
     {
+
         $validate = $valid->rules($r);
 
         if ($validate->fails()) {
+            // dd($validate->erros());
             $message = $valid->messages($validate->errors());
-            return response()->jsonApiBpjs(422, "Error Require Form", $message);    
+            return response()->jsonApiBpjs(422, implode(",",$message));    
         }
 
         $result = $this->antrian->postAntrian($r);
-        // dd($result);
         
         if ($result['code'] == 200) {
             unset($result['code']);
             return response()->jsonApiBpjs(200, "OK", $result);
         }
-        
 
+        // dd($result);
         unset($result['code']);
-        return response()->jsonApiBpjs(201, $result['messageError'], $result);
+        return response()->jsonApiBpjs(201, $result['messageError']);
     }
 
     public function getRekapAntrian(Request $r, PostRekap $valid)

@@ -17,6 +17,7 @@ class Antrian
     {
         try {
             $saveRegister = $this->simpanRegistrasi($params);
+
             if ($saveRegister) {
                 return $saveRegister;
             }
@@ -89,20 +90,40 @@ class Antrian
         ])->get();
     }
 
+    private function checkRujukan($noRujukan, $noReferensi)
+    {
+        // cek no referensi jika jiks 1  ke rujukan
+        if ($noReferensi == 1) {
+            dd("masuk ke rujukan");
+        } else {
+            dd("masuk ke kontrol");
+        }
+
+    }
+
     // --- TABEL REGISTRASI
     private function simpanRegistrasi($params)
     {
+        if (Waktu::tanggalMerah($params->tanggalperiksa)) {
+            $res['code'] = 201;
+            $res['messageError'] = Waktu::tanggalMerah($params->tanggalperiksa);
+            return $res;
+        }
+
+        $checkRujukan = $this->checkRujukan($params->nomorreferensi, $params->jenisreferensi);
+        dd($checkRujukan);
+        
         $dataPasien = $this->getDataPasien($params->nomorkartu);
         if ($dataPasien == null) {
             $res['code']  = 201;
             $res['messageError'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
             return $res;
         }
-
+      
         $dokterPoli = $this->getDokterPoli($params->kodepoli, $params->tanggalperiksa);
         if ($dokterPoli == null) {
             $res['code']  = 201;
-            $res['messageError'] = "Poli tujuan yang terpilih salah!!!";
+            $res['messageError'] = "Poli yang di pilih tidak tersedia!!!";
             return $res;
         }
 
@@ -110,7 +131,7 @@ class Antrian
         if ($checkRegister)
         {
             $res['code']  = 201;
-            $res['messageError'] = "Pasien dengan pembayaran Bpjs/Asuransi lain hanya dapat mendaftar 1 x perhari!!";
+            $res['messageError'] = "PENDAFTARAN BPJS SEKALI DALAM SEHARI...!!";
             return $res;
         }
        
@@ -122,7 +143,6 @@ class Antrian
         $statusPengunjung  = $this->getStatusPengunjung($dataPasien->no_rm);
         $asalPasien        = $this->asalPasien($params->jenisreferensi, $params->nomorreferensi);
         $kodePenjamin      = $this->getKodePenjamin($params->nomorkartu, $params->tanggalperiksa);
-        // dd($kodePenjamin, $asalPasien);
 
         DB::beginTransaction();
         try{
@@ -144,13 +164,13 @@ class Antrian
             if (!$saveRegister) {
                 DB::rollback();
                 $res['code']  = 201;
-                $res['messageError'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
+                $res['messageError'] = "Pasien tersebut belom terdaftar di rumah sakit kami! silahkan daftar langung ke rumah sakit";
             } else {
-                $rajal         = $this->saveRajal($noReg, $dokterPoli, $statusPengunjung, $dataPasien);
-                $tagihan       = $this->saveTagihan($noBukti, $dokterPoli, $tarif, $noReg, $params, $dataPasien, $kodePenjamin);
-                $rujukan       = $this->saveRujukan($noReg, $dataPasien->no_rm, $params);
+                $this->saveRajal($noReg, $dokterPoli, $statusPengunjung, $dataPasien);
+                $this->saveTagihan($noBukti, $dokterPoli, $tarif, $noReg, $params, $dataPasien, $kodePenjamin);
+                $this->saveRujukan($noReg, $dataPasien->no_rm, $params);
+                $this->putTelepon($dataPasien->no_rm, $params->notelp, $params->nik);
                 $nomorAntrian  = $this->getAntrian($noReg, $params->tanggalperiksa, $dokterPoli->kd_sub_unit);
-                $updateTelepon = $this->putTelepon($dataPasien->no_rm, $params->notelp, $params->nik);
 
                 $res['code'] = 200;
                 $res['nomorantrean'] = $nomorAntrian;
@@ -386,7 +406,7 @@ class Antrian
 
     private function getDokterPoli($kodePoli, $tanggal)
     {
-        return DB::connection($this->dbsimrs)->table('jadwal_dokter_poli_rj as j')
+        $jadwaDokter = DB::connection($this->dbsimrs)->table('jadwal_dokter_poli_rj as j')
                 ->select('j.kd_sub_unit','j.kd_pegawai', 'p.nama_pegawai')
                 ->join('sub_unit as s', 'j.kd_sub_unit', '=', 's.kd_sub_unit')
                 ->join('pegawai as p', 'j.kd_pegawai', '=', 'p.kd_pegawai')
@@ -395,6 +415,44 @@ class Antrian
                     ['j.kd_hari', Waktu::tanggalToNilai($tanggal)]
                 ])
                 ->first();
+
+        if ($jadwaDokter) {
+            $dokterPengganti = $this->getDokterPengganti($jadwaDokter->kd_sub_unit, $tanggal);
+            if (!is_null($dokterPengganti)) {
+                if ($dokterPengganti->status_pergantian == 0){
+
+                    unset($dokterPengganti->status_pengganti);
+    
+                    $res = $dokterPengganti;
+                   
+                } else {
+                    $res = null;
+                }
+            } else {
+                $res = $jadwaDokter;
+            }
+        } else {
+            $res =  $jadwaDokter;
+        }
+
+        return $res;
+    }
+
+    private function getDokterPengganti($kodePoli, $tanggal)
+    {
+        // dd($kodePoli, $tanggal);
+        $tgl_register = date('Y-m-d', strtotime($tanggal));
+
+        return DB::connection($this->dbsimrs)->table('jadwal_dokter_poli_rj_pengganti AS dpp')
+            ->select('dpp.kd_pegawai', 'dpp.status_pergantian','p.nama_pegawai','dpp.kd_sub_unit')
+            ->join('pegawai AS p',function($join){
+                $join->on('dpp.kd_pegawai','=','p.kd_pegawai');
+            })
+            ->where([
+                ['dpp.kd_sub_unit','=', $kodePoli],
+                ['dpp.tanggal','=', $tgl_register]
+            ])
+            ->first();
     }
 
     private function getStatusPengunjung($noRm)

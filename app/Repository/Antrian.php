@@ -45,13 +45,13 @@ class Antrian
         }
         // dd($dokterPoli);
         $rekap = $this->getRekap($dokterPoli->kd_sub_unit, $params->tanggalperiksa); 
-        if (!$rekap->count()) {
+        if (!$rekap->count() == 0) {
             $res['code']  = 201;
             $res['messageError'] = "Jumlah Poli belum ada antrian!!";
             return $res;
         }
 
-        $jumlah = $this->getJumlah($dokterPoli->kd_sub_unit, $params->tanggalperiksa);
+        $jumlah = $this->getJumlah("100", $params->tanggalperiksa);
         if (!$jumlah->count() == 0) {
             $res['code']  = 201;
             $res['messageError'] = "Poli Tersebut belum ada antrian!!";

@@ -45,13 +45,13 @@ class Antrian
         }
         // dd($dokterPoli);
         $rekap = $this->getRekap($dokterPoli->kd_sub_unit, $params->tanggalperiksa); 
-        if (!$rekap->count() == 0) {
+        if (!$rekap->count()) {
             $res['code']  = 201;
             $res['messageError'] = "Jumlah Poli belum ada antrian!!";
             return $res;
         }
 
-        $jumlah = $this->getJumlah("100", $params->tanggalperiksa);
+        $jumlah = $this->getJumlah($dokterPoli->kd_sub_unit, $params->tanggalperiksa);
         if (!$jumlah->count() == 0) {
             $res['code']  = 201;
             $res['messageError'] = "Poli Tersebut belum ada antrian!!";
@@ -64,31 +64,32 @@ class Antrian
         $res['namapoli'] = $tarif->nama_sub_unit;
         $res['totalantrean'] = $rekap->count();
         $res['jumlahterlayani'] = $jumlah->count();
-        $res['lastupdate'] = time();
+        $res['lastupdate'] = time() * 1000;
 
         return $res;
     }
 
     private function getJumlah($kdPoli, $tanggalPeriksa)
     {
-        return DB::connection($this->dbsimrs)->table('rawat_jalan')
-                ->join('registrasi', 'rawat_jalan.no_reg','=', 'registrasi.no_reg')
-                ->where([
-                    'rawat_jalan.kd_poliklinik' => $kdPoli,
-                    'registrasi.tgl_reg' => $tanggalPeriksa,
-                    'rawat_jalan.pemeriksaan_dokter' => '1'
-                ])->get();
+        return DB::connection($this->dbsimrs)
+            ->table('rawat_jalan')
+            ->join('registrasi', 'rawat_jalan.no_reg','=', 'registrasi.no_reg')
+            ->where([
+                'rawat_jalan.kd_poliklinik' => $kdPoli,
+                'registrasi.tgl_reg' => $tanggalPeriksa,
+                'rawat_jalan.pemeriksaan_dokter' => '1'
+            ])->get();
     }
 
     private function getRekap($kdPoli, $tanggalPeriksa)
     {
         return DB::connection($this->dbsimrs)
-        ->table('rawat_jalan')
-        ->join('registrasi', 'rawat_jalan.no_reg','=', 'registrasi.no_reg')
-        ->where([
-            'rawat_jalan.kd_poliklinik' => $kdPoli,
-            'registrasi.tgl_reg' => $tanggalPeriksa
-        ])->get();
+            ->table('rawat_jalan')
+            ->join('registrasi', 'rawat_jalan.no_reg','=', 'registrasi.no_reg')
+            ->where([
+                'rawat_jalan.kd_poliklinik' => $kdPoli,
+                'registrasi.tgl_reg' => $tanggalPeriksa
+            ])->get();
     }
 
     private function checkRujukan($tanggalPeriksa, $noRujukan, $noReferensi)

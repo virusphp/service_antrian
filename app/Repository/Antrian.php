@@ -320,7 +320,7 @@ class Antrian
     private function getEstimasi($tanggal)
     {
         $estimasi = $tanggal." 08:00:00";
-        return strtotime($estimasi);
+        return strtotime($estimasi) * 1000;
     }
 
     private function putTelepon($noRm, $noTelp, $nik)

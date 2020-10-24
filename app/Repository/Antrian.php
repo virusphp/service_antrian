@@ -52,7 +52,7 @@ class Antrian
         }
 
         $jumlah = $this->getJumlah($dokterPoli->kd_sub_unit, $params->tanggalperiksa);
-        if ($jumlah->count() == 0) {
+        if (!$jumlah->count() == 0) {
             $res['code']  = 201;
             $res['messageError'] = "Poli Tersebut belum ada antrian!!";
             return $res;

@@ -59,6 +59,6 @@ class AntrianController extends Controller
         }
 
         unset($result['code']);
-        return response()->jsonApiBpjs(201, $result['messageError'], $result);
+        return response()->jsonApiBpjs(201, $result['messageError']);
     }
 }

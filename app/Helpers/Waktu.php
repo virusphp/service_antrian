@@ -26,4 +26,18 @@ class Waktu
         //bukan tanggal merah
         else : return false ; endif;
     }
+
+    public static function tglMaxRujukan($tglkunjungan, $tanggalperiksa)
+    {
+        $maxTglKunjungan = date("Y-m-d", strtotime("+90 days", strtotime($tglkunjungan)));
+
+        if (strtotime($tanggalperiksa) > strtotime($maxTglKunjungan))
+        {
+            $res = 1;
+        } else {
+            $res = 0;
+        }
+
+        return $res;
+    }
 }

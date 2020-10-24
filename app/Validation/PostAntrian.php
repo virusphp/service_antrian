@@ -13,16 +13,16 @@ class PostAntrian
             'nomorkartu' => 'required',
             'nik' => 'required',
             'notelp' => 'required',
-            'tanggalperiksa' => 'date',
+            'tanggalperiksa' => 'required|date',
             'kodepoli' => 'required',
             'nomorreferensi' => 'required',
             'jenisreferensi' => 'required|in:1,2',
             'jenisrequest' => 'required|in:1,2',
-            'polieksekutif' => 'required',
+            'polieksekutif' => 'required|in:0,1',
         ],[
-            'required' => 'Tidak boleh kosong / Null!',
-            'date'     => 'Tidak sesuai tanggal nasional! / Tidak Valid',
-            'in'       => 'Tidak sesuai!!'
+            'required' => 'Tidak boleh kosong atau NULL!',
+            'date'     => 'Tidak sesuai tanggal NASIONAl! atau Tidak Valid',
+            'in'       => 'Tidak sesuai!!',
         ]);
     }
 

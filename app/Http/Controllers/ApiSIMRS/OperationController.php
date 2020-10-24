@@ -25,7 +25,7 @@ class OperationController extends Controller
 
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonApiBpjs(422, "Error Require Form", $message);    
+            return response()->jsonApiBpjs(422, implode(",",$message));    
         }
 
         $result = $this->operasi->postOperasi($r);
@@ -34,7 +34,7 @@ class OperationController extends Controller
             $message = [
                 "messageError" => "Perserta tidak mempunyai riwayat operasi!"
             ];
-            return response()->jsonApiBpjs(201, "Peserta tidka mempunyai riwayat operasi!", $message);
+            return response()->jsonApiBpjs(201, $message['messageError']);
         }
 
         $transform = $this->transform->mapOperasi($result);
@@ -48,16 +48,16 @@ class OperationController extends Controller
 
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonApiBpjs(422, "Error Require Form", $message);    
+            return response()->jsonApiBpjs(422, implode(",",$message));    
         }
 
         $result = $this->operasi->postJadwal($r);
 
         if (!$result->count()) {
             $message = [
-                "messageError" => "Perserta tidak mempunyai riwayat operasi!"
+                "messageError" => "Jadwal Operasi tidak tersdiah pada hari yang di pilih!"
             ];
-            return response()->jsonApiBpjs(201, "Peserta tidak mempunyai riwayat operasi!", $message);
+            return response()->jsonApiBpjs(201, $message['messageError']);
         }
 
         $transform = $this->transform->mapJadwal($result);

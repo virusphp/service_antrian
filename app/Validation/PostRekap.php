@@ -12,6 +12,9 @@ class PostRekap
             'tanggalperiksa' => 'required|date',
             'kodepoli' => 'required',
             'polieksekutif' => 'required',
+        ],[
+            'required' => 'Tidak boleh kosong atau NULL!',
+            'date'     => 'Tidak sesuai tanggal NASIONAL! atau Tidak Valid',
         ]);
     }
 

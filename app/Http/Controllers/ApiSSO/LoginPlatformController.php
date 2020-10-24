@@ -25,7 +25,7 @@ class LoginPlatformController extends Controller
 
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonApi(422, "Error Require Form", $message);    
+            return response()->jsonApi(422, implode(",",$message));    
         }
 
         $data = ["username" => $r->username, "password" => $r->password];
@@ -37,7 +37,7 @@ class LoginPlatformController extends Controller
                 "messageError" => "Username tidak di temukan!"
             ];
         
-            return response()->jsonApi(201, "User not found!", $message);
+            return response()->jsonApi(201, $message["messageError"]);
         }
 
         if (!Hash::check($data['password'], $access->password)) {
@@ -46,9 +46,9 @@ class LoginPlatformController extends Controller
             ];
 
             if ($access->scope=="bpdjateng"){
-                return response()->jsonApiBPD(403, "Passowrd not match!", $message);
+                return response()->jsonApiBPD(403, $message["messageError"]);
             } else {
-                return response()->jsonApiBpjs(403, "Passowrd not match!", $message);
+                return response()->jsonApiBpjs(403, $message["messageError"]);
             }
         } 
 

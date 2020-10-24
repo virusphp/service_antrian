@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Helpers\BPJSHelper;
 use App\Helpers\Waktu;
+use App\Http\Controllers\BridgingBPJS\RujukanController;
 use App\Service\Bpjs\Bridging;
 use DB;
 use Carbon\Carbon;
@@ -90,13 +91,34 @@ class Antrian
         ])->get();
     }
 
-    private function checkRujukan($noRujukan, $noReferensi)
+    private function checkRujukan($tanggalPeriksa, $noRujukan, $noReferensi)
     {
         // cek no referensi jika jiks 1  ke rujukan
         if ($noReferensi == 1) {
-            dd("masuk ke rujukan");
+            $rujukan = new RujukanController;
+            $dataRujukan = $rujukan->RujukanPcare($noRujukan);
+            $dataRujukan = json_decode($dataRujukan);
+            $metadata = $dataRujukan->metaData;
+            $response = $dataRujukan->response;
+            if ($metadata->code == 200) {
+                $tglKunjungan = $response->rujukan->tglKunjungan;
+                $checkMaxRujukan = Waktu::tglMaxRujukan($tglKunjungan, $tanggalPeriksa);
+            } else {
+                $dataRujukan = $rujukan->RujukanRs($noRujukan);
+                $dataRujukan = json_decode($dataRujukan);
+                $metadata = $dataRujukan->metaData;
+                $response = $dataRujukan->response;
+                if ($metadata->code = 200) {
+                    $tglKunjungan = $response->rujukan->tglKunjungan;
+                    $checkMaxRujukan = Waktu::tglMaxRujukan($tglKunjungan, $tanggalPeriksa);
+                } else {
+                    $checkMaxRujukan = 2;
+                }
+            }
+            return $checkMaxRujukan;
         } else {
-            dd("masuk ke kontrol");
+           $checkMaxRujukan = 3;
+           return $checkMaxRujukan; 
         }
 
     }
@@ -110,8 +132,20 @@ class Antrian
             return $res;
         }
 
-        $checkRujukan = $this->checkRujukan($params->nomorreferensi, $params->jenisreferensi);
-        dd($checkRujukan);
+        $checkRujukan = $this->checkRujukan($params->tanggalperiksa, $params->nomorreferensi, $params->jenisreferensi);
+        if ($checkRujukan == 1) {
+            $res['code'] = 201;
+            $res['messageError'] = "Tanggal Rujukan sudah melebihi 90 hari !!";
+            return $res;
+        } else if($checkRujukan == 2) {
+            $res['code'] = 201;
+            $res['messageError'] = "Rujukan tidak di temukan atau tidak valid !!";
+            return $res;
+        } else if($checkRujukan == 3) {
+            $res['code'] = 201;
+            $res['messageError'] = "Rujukan dengan surat kontrol blom sesuai format RS!!";
+            return $res;
+        }
         
         $dataPasien = $this->getDataPasien($params->nomorkartu);
         if ($dataPasien == null) {
@@ -123,7 +157,7 @@ class Antrian
         $dokterPoli = $this->getDokterPoli($params->kodepoli, $params->tanggalperiksa);
         if ($dokterPoli == null) {
             $res['code']  = 201;
-            $res['messageError'] = "Poli yang di pilih tidak tersedia!!!";
+            $res['messageError'] = "Poli yang di pilih tidak tersedia atau tidak valid!!!";
             return $res;
         }
 
@@ -132,6 +166,12 @@ class Antrian
         {
             $res['code']  = 201;
             $res['messageError'] = "PENDAFTARAN BPJS SEKALI DALAM SEHARI...!!";
+            return $res;
+        }
+        // Poli eksekutif
+        if ($params->polieksekutif == 1) {
+            $res['code']  = 201;
+            $res['messageError'] = "Pendaftaran poli eksekutif hanya dapat di lakukan langsung ke RS!!";
             return $res;
         }
        

@@ -10,6 +10,8 @@ class PostOperasi
     {
         return Validator::make($request->all(),[
             'nopeserta' => 'required',
+        ],[
+            'required' => 'Tidak boleh kosong'
         ]);
     }
 
@@ -18,7 +20,7 @@ class PostOperasi
         $error = [];
         foreach($errors->getMessages() as $key => $value)
         {
-                $error[$key] = $value[0];
+            $error[] = $key. ' '.$value[0];
         }
         return $error;
         

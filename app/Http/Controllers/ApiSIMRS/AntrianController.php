@@ -48,7 +48,7 @@ class AntrianController extends Controller
 
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonApiBpjs(422, "Error Require Form", $message);    
+            return response()->jsonApiBpjs(422, implode(",", $message));    
         }
 
         $result = $this->antrian->postRekap($r);

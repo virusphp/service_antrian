@@ -47,7 +47,6 @@ class Operasi
                 ->join('dbsimrs.dbo.penjamin_pasien as pp', 'jo.no_rm','=','pp.no_rm')
                 ->whereBetween('jo.tgl_tindakan', [$params->tanggalawal, $params->tanggalakhir])
                 ->get();
-
             return $listJadwal;
 
         } catch (Exception $e) {

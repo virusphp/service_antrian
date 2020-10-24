@@ -40,4 +40,17 @@ class Waktu
 
         return $res;
     }
+
+    public static function selisihTanggal($tanggalawal, $tanggalakhir)
+    {
+        if (strtotime($tanggalawal) > strtotime($tanggalakhir)) {
+            // dd("masuk sini lebih besar");
+            $res = 1;
+        } else {
+            // dd("benar");
+            $res = 0;
+        }
+
+        return $res;
+    }
 }

@@ -13,7 +13,7 @@ class TransformOperasi
                     'jenistindakan'  => $value->nama_jenis_tindakan_operasi,
                     'kodepoli'       => $value->kd_poli_dpjp,
                     'namapoli'       => $value->nama,
-                    'terlaksana'     => $value->status_proses,
+                    'terlaksana'     => (int)$value->status_proses,
             ];
         }
 

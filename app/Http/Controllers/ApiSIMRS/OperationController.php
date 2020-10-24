@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ApiSIMRS;
 
+use App\Helpers\Waktu;
 use App\Http\Controllers\Controller;
 use App\Transform\TransformOperasi;
 use Illuminate\Http\Request;
@@ -49,6 +50,12 @@ class OperationController extends Controller
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
             return response()->jsonApiBpjs(422, implode(",",$message));    
+        }
+
+        $checkTanggal = Waktu::selisihTanggal($r->tanggalawal, $r->tanggalakhir);
+        if ($checkTanggal == 1) {
+            $message['messageError'] = "Tanggal awal tidak boleh lebih besar dr tanggal akhir!!";
+            return response()->jsonApiBpjs(201, $message['messageError']);
         }
 
         $result = $this->operasi->postJadwal($r);

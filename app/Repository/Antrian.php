@@ -108,7 +108,7 @@ class Antrian
                 $dataRujukan = json_decode($dataRujukan);
                 $metadata = $dataRujukan->metaData;
                 $response = $dataRujukan->response;
-                if ($metadata->code = 200) {
+                if ($metadata->code == 200) {
                     $tglKunjungan = $response->rujukan->tglKunjungan;
                     $checkMaxRujukan = Waktu::tglMaxRujukan($tglKunjungan, $tanggalPeriksa);
                 } else {

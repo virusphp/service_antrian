@@ -133,20 +133,21 @@ class Antrian
             return $res;
         }
 
-        $checkRujukan = $this->checkRujukan($params->tanggalperiksa, $params->nomorreferensi, $params->jenisreferensi);
-        if ($checkRujukan == 1) {
-            $res['code'] = 201;
-            $res['messageError'] = "Tanggal Rujukan sudah melebihi 90 hari !!";
-            return $res;
-        } else if($checkRujukan == 2) {
-            $res['code'] = 201;
-            $res['messageError'] = "Rujukan tidak di temukan atau tidak valid !!";
-            return $res;
-        } else if($checkRujukan == 3) {
-            $res['code'] = 201;
-            $res['messageError'] = "Rujukan dengan surat kontrol blom sesuai format RS!!";
-            return $res;
-        }
+        // VALIDASI LIVE API
+        // $checkRujukan = $this->checkRujukan($params->tanggalperiksa, $params->nomorreferensi, $params->jenisreferensi);
+        // if ($checkRujukan == 1) {
+        //     $res['code'] = 201;
+        //     $res['messageError'] = "Tanggal Rujukan sudah melebihi 90 hari !!";
+        //     return $res;
+        // } else if($checkRujukan == 2) {
+        //     $res['code'] = 201;
+        //     $res['messageError'] = "Rujukan tidak di temukan atau tidak valid !!";
+        //     return $res;
+        // } else if($checkRujukan == 3) {
+        //     $res['code'] = 201;
+        //     $res['messageError'] = "Rujukan dengan surat kontrol blom sesuai format RS!!";
+        //     return $res;
+        // }
         
         $dataPasien = $this->getDataPasien($params->nomorkartu);
         if ($dataPasien == null) {

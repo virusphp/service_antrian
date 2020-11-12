@@ -320,7 +320,7 @@ class Antrian
 
     private function getEstimasi($tanggal)
     {
-        $estimasi = $tanggal." 08:00:00";
+        $estimasi = $tanggal." 00::05:00";
         return strtotime($estimasi) * 1000;
     }
 

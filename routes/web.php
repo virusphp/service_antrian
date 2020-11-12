@@ -23,6 +23,7 @@ $router->group(['namespace'  => 'ApiSSO'], function() use ($router) {
 
 // ------------------- REGISTRASI POLIKLINIK MULTI PLATFORM
 $router->group(['namespace' => 'ApiSIMRS', 'middleware' => 'bpjs'], function() use ($router) {
+    $router->post('/tagihan/gettagihan', 'TagihanController@getTagihan');
     $router->post('/antrian/registrasi/via/bpjs', 'AntrianController@Register');
     $router->post('/antrian/getrekap', 'AntrianController@getRekapAntrian');
     $router->post('/operasi/getoperasi', 'OperationController@getOperasi');

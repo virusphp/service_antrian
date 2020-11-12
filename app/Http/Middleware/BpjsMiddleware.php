@@ -43,8 +43,9 @@ class BpjsMiddleware
         if (!$accessPlatform) {
             return response()->jsonApiBpjs(402, "Not Matching", "Token tidak sesuai");
         }
-
+        // dd($accessPlatform);
         $response = $next($request);
+
 
         foreach($headers as $key => $value)
         {

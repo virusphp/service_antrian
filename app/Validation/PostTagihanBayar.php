@@ -4,16 +4,16 @@ namespace App\Validation;
 
 use Illuminate\Support\Facades\Validator;
 
-class PostPasien
+class PostTagihanBayar
 {
     public function rules($request)
     {
         return Validator::make($request->all(),[
             'no_rm' => 'required', 
-            'tanggal_tagihan' => 'required|date'         
+            'no_reg' => 'required',
+            'jenis_rawat' => 'required'         
         ],[
-            'required' => 'Tidak boleh kosong atau NULL!',
-            'date'     => 'Tidak sesuai tanggal NASIONAl!',
+            'required' => 'Tidak boleh kosong',
         ]);
     }
 

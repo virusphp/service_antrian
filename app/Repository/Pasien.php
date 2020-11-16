@@ -11,7 +11,7 @@ class Pasien
     public function getPasien($params)
     {
         return DB::connection($this->dbsimrs)->table('pasien')
-            ->select('no_rm','nama_pasien','alamat', 'jns_kel','tgl_lahir')
+            ->select('no_rm','nama_pasien','alamat','rt','rw', 'jns_kel','tgl_lahir')
             ->where('no_rm', $params['no_rm'])
             ->first();
     }

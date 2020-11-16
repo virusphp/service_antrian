@@ -46,9 +46,9 @@ class LoginPlatformController extends Controller
             ];
 
             if ($access->scope=="bpdjateng"){
-                return response()->jsonApiBPD(403, $message["messageError"]);
+                return response()->jsonApi(403, $message["messageError"]);
             } else {
-                return response()->jsonApiBpjs(403, $message["messageError"]);
+                return response()->jsonApi(403, $message["messageError"]);
             }
         } 
 
@@ -57,9 +57,9 @@ class LoginPlatformController extends Controller
         $transform = $this->transform->mapLogin($access);
         // dd($transform);
         if ($access->scope=="bpdjateng"){
-            return response()->jsonApiBPD(200, "Login Success!", $transform);
+            return response()->jsonApi(200, "Login Success!", $transform);
         } else {
-            return response()->jsonApiBpjs(200, "OK", $transform);
+            return response()->jsonApi(200, "OK", $transform);
         }
     }
 }

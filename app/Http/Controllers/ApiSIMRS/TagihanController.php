@@ -54,4 +54,15 @@ class TagihanController extends Controller
 
         return response()->jsonApi(200, "OK", $transform);
     }
+
+    public function getTagihanRI(Request $r, PostTagihanRi $valid)
+    {
+        $validate = $valid->rules($r);
+
+        if ($validate->fails()) {
+            // dd($validate->erros());
+            $message = $valid->messages($validate->errors());
+            return response()->jsonApiBpjs(422, implode(",",$message));    
+        }
+    }
 }

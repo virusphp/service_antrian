@@ -22,4 +22,18 @@ class Perubahan
     {
         return date('Y-m-d', strtotime($nilai));
     }
+
+    public static function jenis_rawat($nilai)
+    {
+        $hasil = substr($nilai,0,2);
+        if($hasil=='01'){
+            return "RJ";
+        }else if($hasil=='02'){
+            return "RI";
+        }else if($hasil=='03'){
+           return "RD";
+        }else{
+            return "LB";
+        }
+    }
 }

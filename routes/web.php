@@ -22,8 +22,7 @@ $router->group(['namespace'  => 'ApiSSO'], function() use ($router) {
 });
 
 // ------------------- REGISTRASI POLIKLINIK MULTI PLATFORM
-$router->group(['namespace' => 'ApiSIMRS', 'middleware' => 'bpjs'], function() use ($router) {
-    $router->post('/tagihan/gettagihan', 'TagihanController@getTagihan');
+$router->group(['namespace' => 'ApiSIMRS', 'middleware' => 'bpjs'], function() use ($router) {    
     $router->post('/antrian/registrasi/via/bpjs', 'AntrianController@Register');
     $router->post('/antrian/getrekap', 'AntrianController@getRekapAntrian');
     $router->post('/operasi/getoperasi', 'OperationController@getOperasi');
@@ -74,6 +73,14 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
 });
 
 // ----------------- API BRIDGING BANK JATENG
-$router->group(['namespace'  => 'BridgingBankJateng', 'middleware' => 'bankjateng'], function() use ($router) {
-    $router->get('/tagihanpasien/{noRM}', 'BankJatengController@tagihanPasien');
+$router->group(['namespace'  => 'ApiSIMRS', 'middleware' => 'bankjateng'], function() use ($router) {
+    // $router->get('/tagihanpasien/{noRM}', 'BankJatengController@tagihanPasien');
+    $router->get('/tagihan/rj/gettagihan', 'TagihanController@getTagihanRJ');
+    $router->get('/tagihan/ri/gettagihan', 'TagihanController@getTagihanRI');
+    $router->get('/tagihan/rd/gettagihan', 'TagihanController@getTagihanRD');
+});
+
+$router->group(['namespace'  => 'ApiBankJateng', 'middleware' => 'bankjateng'], function() use ($router) {
+    // $router->get('/tagihanpasien/{noRM}', 'BankJatengController@tagihanPasien');
+    $router->post('/tagihan/bayartagihan', 'BankJatengController@bayarTagihan');
 });

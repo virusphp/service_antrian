@@ -80,6 +80,7 @@ $app->configure('bpjs');
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'bpjs' => App\Http\Middleware\BpjsMiddleware::class,
+    'bankjateng' => App\Http\Middleware\BankJatengMiddleware::class,
 ]);
 
 $app->middleware([

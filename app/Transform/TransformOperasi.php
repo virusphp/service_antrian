@@ -31,7 +31,7 @@ class TransformOperasi
                     'namapoli'       => $value->nama,
                     'terlaksana'     => (int)$value->status_proses,
                     'nopeserta'      => $value->no_kartu,
-                    'lastupdate'     => lastUpdate($value->tgl_tindakan)
+                    'lastupdate'     => time() * 1000
             ];
         }
 

@@ -9,6 +9,7 @@ use App\Transform\TransformTagihan;
 use App\Validation\PostPasien;
 use Illuminate\Http\Request;
 
+
 class TagihanController extends Controller
 {
     protected $pasien;
@@ -23,103 +24,124 @@ class TagihanController extends Controller
     public function getTagihanRJ(Request $r, PostPasien $valid)
     {
         $validate = $valid->rules($r);
-
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonApiBpjs(422, implode(",",$message));    
+            return response()->jsonApiBpjs('01', implode(",",$message));    
         }
 
-        $pasien = $this->pasien->getPasien($r);
-        
+        $pasien = $this->pasien->getPasien($r);        
         if (!$pasien) {
             $message = [
-                "messageError" => "Data Pasien tidak di temukan!"
-            ];
-        
-            return response()->jsonApi(201, $message["messageError"]);;
+                "messageError" => "Data Pasien tidak di temukan (No RM tidak terdaftar)"
+            ];        
+            return response()->jsonApi('01', $message["messageError"]);;
         }
         
         $tagihan = $this->tagihan->getTagihanRJ($r);
-
-        if (!$tagihan->count()) {
+        if($tagihan=='01'){
             $message = [
                 "messageError" => "Data Tagihan Pasien tidak di temukan!"
-            ];
-        
-            return response()->jsonApi(201, $message["messageError"]);;
-        }
-
-        $transform = $this->transform->mapperTagihan($pasien, $tagihan);
-
-        return response()->jsonApi(200, "OK", $transform);
+            ];        
+            return response()->jsonApi('01', $message["messageError"]);
+        }else if($tagihan=='02'){
+            $message = [
+                "messageError" => "Data Tagihan Pasien Sudah Dibayar"
+            ];        
+            return response()->jsonApi('02', $message["messageError"]);
+        }else{
+            if (!$tagihan->count()) {               
+                $message = [
+                    "messageError" => "Data Tagihan Pasien tidak di temukan!"
+                ];
+            
+                return response()->jsonApi('01', $message["messageError"]);
+            }
+            $tgl_reg = $r['tgl_registrasi'];
+            $transform = $this->transform->mapperTagihan($pasien, $tagihan, $tgl_reg);    
+            return response()->jsonApi('00', "Data Tagihan Pasien Ditemukan", $transform);
+        }        
     }
 
     public function getTagihanRI(Request $r, PostPasien $valid)
     {
         $validate = $valid->rules($r);
-
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonApiBpjs(422, implode(",",$message));    
+            return response()->jsonApiBpjs('01', implode(",",$message));    
         }
 
-        $pasien = $this->pasien->getPasien($r);
-        
+        $pasien = $this->pasien->getPasien($r);        
         if (!$pasien) {
             $message = [
                 "messageError" => "Data Pasien tidak di temukan!"
-            ];
-        
-            return response()->jsonApi(201, $message["messageError"]);;
+            ];        
+            return response()->jsonApi('01', $message["messageError"]);;
         }
-        
-        $tagihan = $this->tagihan->getTagihanRI($r);
 
-        if (!$tagihan->count()) {
+        $tagihan = $this->tagihan->getTagihanRI($r);  
+        if($tagihan=='01'){
             $message = [
                 "messageError" => "Data Tagihan Pasien tidak di temukan!"
-            ];
-        
-            return response()->jsonApi(201, $message["messageError"]);;
-        }
-
-        $transform = $this->transform->mapperTagihan($pasien, $tagihan);
-
-        return response()->jsonApi(200, "OK", $transform);
+            ];        
+            return response()->jsonApi('01', $message["messageError"]);
+        }else if($tagihan=='02'){
+            $message = [
+                "messageError" => "Data Tagihan Pasien Sudah Dibayar"
+            ];        
+            return response()->jsonApi('02', $message["messageError"]);
+        }else{
+            if (!$tagihan->count()) {               
+                $message = [
+                    "messageError" => "Data Tagihan Pasien tidak di temukan!"
+                ];
+            
+                return response()->jsonApi('01', $message["messageError"]);
+            }
+            $tgl_reg = $r['tgl_registrasi'];
+            $transform = $this->transform->mapperTagihan($pasien, $tagihan, $tgl_reg);    
+            return response()->jsonApi('00', "Data Tagihan Pasien Ditemukan", $transform);
+        }        
     }
 
     public function getTagihanRD(Request $r, PostPasien $valid)
     {
         $validate = $valid->rules($r);
-
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonApiBpjs(422, implode(",",$message));    
+            return response()->jsonApiBpjs('01', implode(",",$message));    
         }
 
-        $pasien = $this->pasien->getPasien($r);
-        
+        $pasien = $this->pasien->getPasien($r);        
         if (!$pasien) {
             $message = [
                 "messageError" => "Data Pasien tidak di temukan!"
-            ];
-        
-            return response()->jsonApi(201, $message["messageError"]);;
+            ];        
+            return response()->jsonApi('01', $message["messageError"]);;
         }
         
         $tagihan = $this->tagihan->getTagihanRD($r);
-
-        if (!$tagihan->count()) {
+        if($tagihan=='01'){
             $message = [
                 "messageError" => "Data Tagihan Pasien tidak di temukan!"
-            ];
-        
-            return response()->jsonApi(201, $message["messageError"]);;
-        }
-
-        $transform = $this->transform->mapperTagihan($pasien, $tagihan);
-
-        return response()->jsonApi(200, "OK", $transform);
+            ];        
+            return response()->jsonApi('01', $message["messageError"]);
+        }else if($tagihan=='02'){
+            $message = [
+                "messageError" => "Data Tagihan Pasien Sudah Dibayar"
+            ];        
+            return response()->jsonApi('02', $message["messageError"]);
+        }else{
+            if (!$tagihan->count()) {               
+                $message = [
+                    "messageError" => "Data Tagihan Pasien tidak di temukan!"
+                ];
+            
+                return response()->jsonApi('01', $message["messageError"]);
+            }
+            $tgl_reg = $r['tgl_registrasi'];
+            $transform = $this->transform->mapperTagihan($pasien, $tagihan, $tgl_reg);    
+            return response()->jsonApi('00', "Data Tagihan Pasien Ditemukan", $transform);
+        }        
     }
    
 }

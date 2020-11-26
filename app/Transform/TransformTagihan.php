@@ -3,42 +3,61 @@
 namespace App\Transform;
 
 use App\Helpers\Perubahan;
+use phpDocumentor\Reflection\Types\Float_;
 
 class TransformTagihan
 {
-    public function mapperTagihan($pasien, $tagihan)
+    public function mapperTagihan($pasien, $tagihan, $tgl_reg)
     {
-        $t = [];
-        $total = 0;
-        foreach($tagihan as $val) {
-            $t['rincian_tagihan'][] = [
-                'no_tagihan' => $val->no_tagihan,
-                'kelompok_tagihan' => $val->Tagihan_A,
-                'no_bukti' => $val->no_bukti,
-                'no_reg' => $val->no_reg,
-                'jenis_rawat' => Perubahan::jenis_rawat($val->no_reg),
-                'tanggal_tagihan' => Perubahan::tanggalSekarang($val->tgl_tagihan),
-                'nama_tarif' => $val->nama_tarif,
-                'biaya' => (int)$val->tunai,
-            ];
-            $total += $val->tunai;
+        $data = [];       
+        $data['pasien'] = [
+            'no_rm' => trim($pasien->no_rm), 
+            'tanggal_registrasi' => $tgl_reg,
+            'nama_pasien' => $pasien->nama_pasien, 
+            'alamat_pasien' => $pasien->alamat.', RT '.$pasien->rt.' RW '.$pasien->rw.' Kel. '.$pasien->nama_kelurahan.' Kec.'.$pasien->nama_kecamatan.' Kab.'.$pasien->nama_kabupaten.' Prov.'.$pasien->nama_propinsi, 
+            'jenis_kelamin_pasien' => Perubahan::jenisKelamin($pasien->jns_kel), 
+            'usia_pasien'  => Perubahan::usia($pasien->tgl_lahir),
+            'tanggal_lahir_pasien' => Perubahan::tanggalSekarang($pasien->tgl_lahir),
+        ];
+        $tagihanPasien = $tagihan->groupBy('no_reg');
+        foreach($tagihanPasien as $key=>$value) {
+            $total = 0;
+            $jenis_rawat = '';
+            $kelompok_tagihan = '';
+            $kelompok = '';
+            foreach($value as $val){
+                $output2[] = [
+                    'no_tagihan' => $val->no_tagihan,
+                    'tanggal_tagihan' => Perubahan::tanggalSekarang($val->tgl_tagihan),
+                    'no_bukti' => $val->no_bukti,
+                    // 'kelompok_tagihan' => $val->Tagihan_A,
+                    // 'kelompok' => $val->kelompok,
+                    // 'no_reg' => $val->no_reg,
+                    // 'jenis_rawat' => Perubahan::jenis_rawat($val->no_reg),
+                    // 'tanggal_tagihan' => Perubahan::tanggalSekarang($val->tgl_tagihan),
+                    'jumlah'=> (int)$val->jumlah,
+                    'nama_tarif' => $val->nama_tarif,
+                    'biaya' => (Float)$val->tunai,
+                    'kd_dokter' =>$val->kd_dokter,
+                    'kd_subunit' =>$val->kd_sub_unit,
+                    'akun_rek1' => $val->rek_p,
+                    'akun_rek2' => $val->rek_p2
+                ];
+                $total += $val->tunai;
+                $jenis_rawat =  Perubahan::jenis_rawat($val->no_reg);
+                $kelompok_tagihan = $val->Tagihan_A;
+                $kelompok = $val->kelompok;
+            }
+            $output[] =[
+                'no_reg' =>$key,
+                'jenis_rawat' => $jenis_rawat,
+                'kelompok_tagihan' => $kelompok_tagihan,
+                'kelompok' => $kelompok,
+                'total_tagihan' => $total,
+                'rincian_tagihan' =>$output2,
+            ]; 
         }
-
-        $p['pasien'] = [
-           'no_rm' => trim($pasien->no_rm), 
-           'nama_pasien' => $pasien->nama_pasien, 
-           'alamat_pasien' => $pasien->alamat.', RT '.$pasien->rt.' RW '.$pasien->rw, 
-           'jenis_kelamin_pasien' => Perubahan::jenisKelamin($pasien->jns_kel), 
-           'usia_pasien'  => Perubahan::usia($pasien->tgl_lahir),
-           'tanggal_lahir_pasien' => Perubahan::tanggalSekarang($pasien->tgl_lahir),
-           'total_tagihan' => $total,
-        ];
-
-        $data = [
-            $p,
-            $t
-        ];
-
+        $data['tagihan'] = $output;
         return $data;
     }
 

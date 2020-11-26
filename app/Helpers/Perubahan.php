@@ -36,4 +36,9 @@ class Perubahan
             return "LB";
         }
     }
+
+    public static function ribuan($nilai)
+    {
+        return number_format($nilai, "2",",",".");
+    }
 }

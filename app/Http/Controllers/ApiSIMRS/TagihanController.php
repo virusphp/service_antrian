@@ -36,7 +36,7 @@ class TagihanController extends Controller
             ];        
             return response()->jsonApi('01', $message["messageError"]);;
         }
-        
+
         $tagihan = $this->tagihan->getTagihanRJ($r);
         if($tagihan=='01'){
             $message = [
@@ -56,7 +56,7 @@ class TagihanController extends Controller
             
                 return response()->jsonApi('01', $message["messageError"]);
             }
-            $tgl_reg = $r['tgl_registrasi'];
+            $tgl_reg = $r['tanggal_registrasi'];
             $transform = $this->transform->mapperTagihan($pasien, $tagihan, $tgl_reg);    
             return response()->jsonApi('00', "Data Tagihan Pasien Ditemukan", $transform);
         }        
@@ -97,7 +97,7 @@ class TagihanController extends Controller
             
                 return response()->jsonApi('01', $message["messageError"]);
             }
-            $tgl_reg = $r['tgl_registrasi'];
+            $tgl_reg = $r['tanggal_registrasi'];
             $transform = $this->transform->mapperTagihan($pasien, $tagihan, $tgl_reg);    
             return response()->jsonApi('00', "Data Tagihan Pasien Ditemukan", $transform);
         }        
@@ -138,7 +138,7 @@ class TagihanController extends Controller
             
                 return response()->jsonApi('01', $message["messageError"]);
             }
-            $tgl_reg = $r['tgl_registrasi'];
+            $tgl_reg = $r['tanggal_registrasi'];
             $transform = $this->transform->mapperTagihan($pasien, $tagihan, $tgl_reg);    
             return response()->jsonApi('00', "Data Tagihan Pasien Ditemukan", $transform);
         }        

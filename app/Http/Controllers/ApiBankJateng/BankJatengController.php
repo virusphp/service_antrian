@@ -27,15 +27,27 @@ class BankJatengController extends Controller
         }
        
         $bayartagihan = $this->tagihan->bayarTagihan($r);
-        if (!$bayartagihan->count()) {
+        if($bayartagihan=='01'){
             $message = [
-                "messageError" => "Error Exception"
+                "messageError" => "Data Tagihan Pasien tidak di temukan!"
             ];        
-            return response()->jsonApi('05', $message["messageError"]);;
-        }        
-        $tgl_reg = $r['pasien.tanggal_registrasi'];
-        $transform = $this->transform->mapperTagihanBayar($bayartagihan,$tgl_reg);
-        return response()->jsonApi('04', "Tagihan Berhasil disimpan", $transform);
+            return response()->jsonApi('01', $message["messageError"]);
+        }else if($bayartagihan=='02'){
+            $message = [
+                "messageError" => "Data Tagihan Pasien Sudah Dibayar"
+            ];        
+            return response()->jsonApi('02', $message["messageError"]);
+        }else{
+            if (!$bayartagihan->count()) {
+                $message = [
+                    "messageError" => "Error Exception"
+                ];        
+                return response()->jsonApi('05', $message["messageError"]);;
+            }        
+            $tgl_reg = $r['pasien.tanggal_registrasi'];
+            $transform = $this->transform->mapperTagihanBayar($bayartagihan,$tgl_reg);
+            return response()->jsonApi('04', "Tagihan Berhasil disimpan", $transform);
+        }
         
     }
 }

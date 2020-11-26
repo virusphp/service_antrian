@@ -9,12 +9,12 @@ class Tagihan
     protected $dbsimrs = "sql_simrs";
 
     public function getnoReg($params)
-    {
+    {   
         $cariReg = DB::connection($this->dbsimrs)->table('registrasi')
                 ->select('no_reg','status_keluar')
                 ->where([
                     ['no_rm', $params['no_rm']],
-                    ['tgl_reg', $params['tgl_registrasi']]
+                    ['tgl_reg', $params['tanggal_registrasi']]
                 ])
                 ->orderBy('status_keluar', 'DESC')
                 ->get();
@@ -87,7 +87,7 @@ class Tagihan
                     ->select('k.no_tagihan','k.Tagihan_A','k.kelompok','k.no_bukti','k.no_reg','k.tgl_tagihan','k.nama_tarif','k.kelompok','k.tunai','k.posisi','k.rek_p','k.rek_p2','k.jumlah','k.kd_dokter','k.kd_sub_unit')
                     ->where('k.no_rm', $params['no_rm'])
                     ->whereIn('k.no_reg',$noReg)
-                    ->where('k.no_reg','like','02%')
+                    ->where('k.no_reg','like','03%')
                     ->get();
             }            
         }
@@ -96,7 +96,20 @@ class Tagihan
     public function bayarTagihan($params)
     {
         $data = ($params->all());
-        return $this->InsertKwitansiHeader($data);        
+        $dataReg = $this->getnoReg($data['pasien']);
+        if(!$dataReg->count()){
+            return "01";
+        }else{
+            foreach($dataReg as $key=>$value){                
+                $data [$key] = $value->status_keluar;
+            }
+
+            if($data[0]=='1'){
+                return "02";
+            }else{
+                return $this->InsertKwitansiHeader($data);
+            }
+        }                
     }
 
     public function InsertKwitansiHeader($data)

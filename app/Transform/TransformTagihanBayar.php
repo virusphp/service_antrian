@@ -11,7 +11,7 @@ class TransformTagihanBayar
         $data =[];
         $total = 0; 
         foreach($bayartagihan as $val){
-            $total += $val->tunai;    
+            $total += $val->tunai;
             if($val->jenis_rawat =='RJ'){
                 $jns_rawat= "Rawat Jalan";
             }else if($val->jenis_rawat =='RI'){
@@ -34,6 +34,7 @@ class TransformTagihanBayar
                 'tanggal_kwitansi' => Perubahan::tanggalSekarang($val->tgl_kwitansi),
                 'jumlah_bayar' => (Float)$val->tunai
             ];
+            
         }       
         $data['rincian_pembayaran'] = $output;        
         return $data;

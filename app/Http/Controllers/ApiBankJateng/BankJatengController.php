@@ -25,7 +25,7 @@ class BankJatengController extends Controller
             $message = $valid->messages($validate->errors());
             return response()->jsonApi('01', implode(",",$message));    
         }
-       
+
         $bayartagihan = $this->tagihan->bayarTagihan($r);
         if($bayartagihan=='01'){
             $message = [

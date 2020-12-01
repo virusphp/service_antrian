@@ -184,6 +184,8 @@ class Tagihan
                     'Potongan_Rupiah_Obat' => '',
                     'Potongan_Persen_Tindakan' => '',
                     'Potongan_Rupiah_Tindakan' => '',
+                    'Paket_Hak_Kelas' =>0,
+                    'Paket_Kelas_Rawat' =>0,
                     'metode_pembayaran' => 2
                 );  
 
@@ -197,9 +199,9 @@ class Tagihan
                         "no_reg"=>$val['no_reg'], 
                         "tgl_tagihan"=>$r['tanggal_tagihan'], 
                         "nama_tarif"=>$r['nama_tarif'], 
-                        "kelompok"=>$val['kelompok'], 
+                        "kelompok"=>$r['kelompok'], 
                         "harga"=>$r['biaya'], 
-                        // "biaya_jaminan"=>'', 
+                        "biaya_jaminan"=>0, 
                         "jumlah"=>$r['jumlah'], 
                         // "discount_persen"=>'', 
                         // "discount_rupiah"=>'', 
@@ -224,7 +226,7 @@ class Tagihan
                         'no_reg' => $val['no_reg'],
                         'no_tagihan' => $r['no_tagihan'],
                         'no_bukti' => $r['no_bukti'],
-                        'kelompok_tagihan' => $val['kelompok_tagihan'],
+                        'kelompok_tagihan' => $r['kelompok_tagihan'],
                         'no_kwitansi' =>$nokwitansi
                     ];                    
                 }  
@@ -232,7 +234,7 @@ class Tagihan
                     'no_reg' =>$val['no_reg']
                 ];
             }
-            DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader);  
+            DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader);             
             DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw);  
             $this->deleteTotalTagihanPasien($update);           
             $this->updateTagihanPasien($update);            

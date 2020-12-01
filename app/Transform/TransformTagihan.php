@@ -30,11 +30,10 @@ class TransformTagihan
                     'no_tagihan' => $val->no_tagihan,
                     'tanggal_tagihan' => Perubahan::tanggalSekarang($val->tgl_tagihan),
                     'no_bukti' => $val->no_bukti,
-                    // 'kelompok_tagihan' => $val->Tagihan_A,
-                    // 'kelompok' => $val->kelompok,
+                    'kelompok_tagihan' => $val->Tagihan_A,
+                    'kelompok' => $val->kelompok,
                     // 'no_reg' => $val->no_reg,
                     // 'jenis_rawat' => Perubahan::jenis_rawat($val->no_reg),
-                    // 'tanggal_tagihan' => Perubahan::tanggalSekarang($val->tgl_tagihan),
                     'jumlah'=> (int)$val->jumlah,
                     'nama_tarif' => $val->nama_tarif,
                     'biaya' => (Float)$val->tunai,
@@ -51,8 +50,6 @@ class TransformTagihan
             $output[] =[
                 'no_reg' =>$key,
                 'jenis_rawat' => $jenis_rawat,
-                'kelompok_tagihan' => $kelompok_tagihan,
-                'kelompok' => $kelompok,
                 'total_tagihan' => $total,
                 'rincian_tagihan' =>$output2,
             ]; 
@@ -83,6 +80,8 @@ class TransformTagihan
                     'no_tagihan' => $val->no_tagihan,
                     'tanggal_tagihan' => Perubahan::tanggalSekarang($val->tgl_tagihan),
                     'no_bukti' => $val->no_bukti,
+                    'kelompok_tagihan' => $val->Tagihan_A,
+                    'kelompok' => $val->kelompok,
                     'jumlah'=> (int)$val->jumlah,
                     'nama_tarif' => $val->nama_tarif,
                     'biaya' => (Float)$val->tunai,
@@ -99,8 +98,6 @@ class TransformTagihan
             $output[] =[
                 'no_reg' =>$key,
                 'jenis_rawat' => $jenis_rawat,
-                'kelompok_tagihan' => $kelompok_tagihan,
-                'kelompok' => $kelompok,
                 'total_tagihan' => $total,
                 'rincian_tagihan' =>$output2,
             ]; 

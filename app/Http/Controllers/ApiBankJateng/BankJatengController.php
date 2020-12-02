@@ -37,6 +37,11 @@ class BankJatengController extends Controller
                 "messageError" => "Data Tagihan Pasien Sudah Dibayar"
             ];        
             return response()->jsonApi('02', $message["messageError"]);
+        }else if($bayartagihan=='05'){
+            $message = [
+                "messageError" => "Error Exception atau data yang dikirim tidak sesuai "
+            ];        
+            return response()->jsonApi('05', $message["messageError"]);
         }else{
             if (!$bayartagihan->count()) {
                 $message = [

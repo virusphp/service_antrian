@@ -85,10 +85,11 @@ class TransformTagihan
                     'jumlah'=> (int)$val->jumlah,
                     'nama_tarif' => $val->nama_tarif,
                     'biaya' => (Float)$val->tunai,
-                    'kd_dokter' =>$val->kd_dokter,
+                    'kd_dokter' =>str_replace(' ', '',$val->kd_dokter),
                     'kd_subunit' =>$val->kd_sub_unit,
                     'akun_rek1' => $val->rek_p,
-                    'akun_rek2' => $val->rek_p2
+                    'akun_rek2' => $val->rek_p2,
+                
                 ];
                 $total += $val->tunai;
                 $jenis_rawat =  Perubahan::jenis_rawat($val->no_reg);

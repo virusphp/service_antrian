@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 use App\Transform\TransformTagihan;
+use App\Helpers\Waktu;
 use DB;
 
 class Tagihan
@@ -28,7 +29,7 @@ class Tagihan
     public function getnoReg($params)
     {   
         $cariReg = DB::connection($this->dbsimrs)->table('registrasi')
-                ->select('no_reg','status_keluar')
+                ->select('no_reg','jns_rawat','status_keluar')
                 ->where([
                     ['no_rm', $params['no_rm']],
                     ['tgl_reg', $params['tanggal_registrasi']]
@@ -112,7 +113,7 @@ class Tagihan
 
     public function bayarTagihan($params)
     {
-        $data = ($params->all()); 
+        $data = ($params->all());         
         $dataReg = $this->getnoReg($data);        
         if(!$dataReg->count()){
             return "01";
@@ -131,21 +132,44 @@ class Tagihan
 
     public function InsertKwitansi($data)
     {
+        $jns_tagihan= $data['jenis_tagihan'];
         $noReg = $data['no_reg'];       
-        $pasien = $this->getPasien($data);        
-        $getTagihan= DB::connection($this->dbsimrs)->table('view_kwitansi as k')
-                        ->select('k.no_tagihan','k.Tagihan_A','k.kelompok','k.no_bukti','k.no_reg','k.tgl_tagihan','k.nama_tarif','k.kelompok','k.tunai','k.posisi','k.rek_p','k.rek_p2','k.jumlah','k.kd_dokter','k.kd_sub_unit')
-                        ->where('k.no_rm', $data['no_rm'])
-                        ->whereIn('k.no_reg',$noReg)
-                        ->get();
-        $transform = $this->transform->mapperTagihanBayar($pasien, $getTagihan, $data);
-        return $this->InsertKwitansiHeader($transform);
+        $pasien = $this->getPasien($data); 
+        if($jns_tagihan=='RJ'){
+            $getTagihan = DB::connection($this->dbsimrs)->table('view_kwitansi as k')
+                            ->select('k.no_tagihan','k.Tagihan_A','k.kelompok','k.no_bukti','k.no_reg','k.tgl_tagihan','k.nama_tarif','k.kelompok','k.tunai','k.posisi','k.rek_p','k.rek_p2','k.jumlah','k.kd_dokter','k.kd_sub_unit')
+                            ->where('k.no_rm', $data['no_rm'])
+                            ->whereIn('k.no_reg',$noReg)
+                            ->where('k.no_reg','like','01%')
+                            ->get();
+        }else if($jns_tagihan=='RI'){
+            $getTagihan = DB::connection($this->dbsimrs)->table('view_kwitansi as k')
+                            ->select('k.no_tagihan','k.Tagihan_A','k.kelompok','k.no_bukti','k.no_reg','k.tgl_tagihan','k.nama_tarif','k.kelompok','k.tunai','k.posisi','k.rek_p','k.rek_p2','k.jumlah','k.kd_dokter','k.kd_sub_unit')
+                            ->where('k.no_rm', $data['no_rm'])
+                            ->whereIn('k.no_reg',$noReg)
+                            ->where('k.no_reg','like','02%')
+                            ->get();
+        }else{
+            $getTagihan = DB::connection($this->dbsimrs)->table('view_kwitansi as k')
+                            ->select('k.no_tagihan','k.Tagihan_A','k.kelompok','k.no_bukti','k.no_reg','k.tgl_tagihan','k.nama_tarif','k.kelompok','k.tunai','k.posisi','k.rek_p','k.rek_p2','k.jumlah','k.kd_dokter','k.kd_sub_unit')
+                            ->where('k.no_rm', $data['no_rm'])
+                            ->whereIn('k.no_reg',$noReg)
+                            ->where('k.no_reg','like','03%')
+                            ->get();
+        }   
+        if(!$getTagihan->count()){
+            return "05";
+        }else{            
+            $transform = $this->transform->mapperTagihanBayar($pasien, $getTagihan, $data); 
+            return $this->InsertKwitansiHeader($transform);
+        }   
+        
     }
 
     public function InsertKwitansiHeader($data)
     {  
         DB::beginTransaction();
-        try {    
+        try {  
             foreach($data['tagihan'] as $key=>$val){ 
                 $no_kw[]= $this->no_kwitansi($val['jenis_rawat'],$key);               
                 $nokwitansi= $this->no_kwitansi($val['jenis_rawat'],$key);
@@ -179,7 +203,7 @@ class Tagihan
                     'kd_kasir' =>'00',
                     'status_bayar' =>'LUNAS',
                     'user_id' =>'00000000',
-                    'tgl_insert' =>date('Y-m-d H:i:s'),
+                    'tgl_insert' =>Waktu::tanggalInsert(),
                     'Potongan_Persen_Obat' => '',
                     'Potongan_Rupiah_Obat' => '',
                     'Potongan_Persen_Tindakan' => '',
@@ -190,7 +214,7 @@ class Tagihan
                 );  
 
                 foreach($val['rincian_tagihan'] as $r){
-                    $dataKw[] = array(
+                    $dataKw= array(
                         "no_kwitansi"=>$nokwitansi, 
                         "jenis_rawat"=>$val['jenis_rawat'], 
                         "tgl_kwitansi"=>date('Y-m-d'), 
@@ -203,10 +227,7 @@ class Tagihan
                         "harga"=>$r['biaya'], 
                         "biaya_jaminan"=>0, 
                         "jumlah"=>$r['jumlah'], 
-                        // "discount_persen"=>'', 
-                        // "discount_rupiah"=>'', 
                         "tunai"=>$r['biaya'], 
-                        // "piutang"=>'', 
                         "tagihan"=>$r['biaya'], 
                         "kd_dokter"=>$r['kd_dokter'], 
                         "penjamin"=>'-', 
@@ -214,11 +235,11 @@ class Tagihan
                         "metode_bayar"=>'TUNAI', 
                         "status_bayar"=>'LUNAS', 
                         "user_id"=>'bankjateng', 
-                        "tgl_insert"=>date('Y-m-d H:i:s'), 
+                        "tgl_insert"=> Waktu::tanggalInsert(), 
                         "kd_kasir"=>'00', 
                         "kd_sub_unit"=>$r['kd_subunit'],
                         "Rek_P"=>$r['akun_rek1'], 
-                        "Rek_P2"=>$r['akun_rek2']
+                        "Rek_P2"=>$r['akun_rek2'],
                     );
 
                     $update[]= [
@@ -228,14 +249,16 @@ class Tagihan
                         'no_bukti' => $r['no_bukti'],
                         'kelompok_tagihan' => $r['kelompok_tagihan'],
                         'no_kwitansi' =>$nokwitansi
-                    ];                    
+                    ];   
+                    DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw); 
                 }  
                 $updateReg[]=[
                     'no_reg' =>$val['no_reg']
                 ];
-            }
-            DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader);             
-            DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw);  
+            }  
+            // dd($dataKwHeader);
+            DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader);  
+            // DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw);
             $this->deleteTotalTagihanPasien($update);           
             $this->updateTagihanPasien($update);            
             $query = $this->updateRegistrasi($updateReg); 

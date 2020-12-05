@@ -111,6 +111,15 @@ class Tagihan
         }
     }
 
+    function cariKwitansiByNoreg($params)
+    {
+        $getKw = DB::connection($this->dbsimrs)->table('Kwitansi_Header')
+                ->select('no_kwitansi','nama_pembayar','alamat_pembayar','untuk','tgl_kwitansi','jenis_rawat','no_rm','no_reg','nama_pasien','alamat','jenis_pasien','nama_penjamin','tunai')
+                ->whereIn('no_reg',$params)
+                ->get();
+        return $getKw;
+    }
+
     public function bayarTagihan($params)
     {
         $data = ($params->all());         
@@ -123,7 +132,11 @@ class Tagihan
                 $data ['no_reg'][] = $value->no_reg;
             }
             if($status[0]=='1'){
-                return "02";
+               $response= [
+                   'status' => '02',
+                   'data' => $this->cariKwitansiByNoreg($data ['no_reg'])
+               ];
+               return $response;
             }else{ 
                 return $this->InsertKwitansi($data);
             }

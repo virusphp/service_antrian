@@ -13,7 +13,7 @@ class PostTagihanBayar
             'no_rm' => 'required', 
             'nama_pembayar' => 'required', 
             'alamat_pembayar' => 'required',
-            'tanggal_registrasi' => 'required', 
+            'tanggal_registrasi' => 'required|date', 
             // 'pasien.nama_pasien' => 'required', 
             // 'pasien.alamat_pasien' => 'required', 
             

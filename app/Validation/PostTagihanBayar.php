@@ -3,6 +3,7 @@
 namespace App\Validation;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class PostTagihanBayar
 {
@@ -11,6 +12,7 @@ class PostTagihanBayar
         // dd($request);
         return Validator::make($request->all(),[
             'no_rm' => 'required', 
+            'jenis_tagihan' => 'required|'.Rule::in(['RJ','RI','RD']),
             'nama_pembayar' => 'required', 
             'alamat_pembayar' => 'required',
             'tanggal_registrasi' => 'required|date', 
@@ -36,6 +38,7 @@ class PostTagihanBayar
             // 'tagihan.*.rincian_tagihan.*.akun_rek1' => 'required', 
         ],[
             'required' => 'Tidak boleh kosong',
+            'in' => 'Tidak sesuai (RJ,RI,RD)'
         ]);
     }
 

@@ -43,21 +43,15 @@ class TagihanController extends Controller
                 "messageError" => "Data Tagihan Pasien tidak di temukan!"
             ];        
             return response()->jsonApi('01', $message["messageError"]);
-        }else if($tagihan=='02'){
-            $message = [
-                "messageError" => "Data Tagihan Pasien Sudah Dibayar"
-            ];        
-            return response()->jsonApi('02', $message["messageError"]);
         }else{
             if (!$tagihan->count()) {               
                 $message = [
-                    "messageError" => "Data Tagihan Pasien tidak di temukan!"
-                ];
-            
-                return response()->jsonApi('01', $message["messageError"]);
+                    "messageError" => "Data Tagihan Pasien Sudah Dibayar"
+                ];        
+                return response()->jsonApi('02', $message["messageError"]);
             }
             $tgl_reg = $r['tanggal_registrasi'];
-            $transform = $this->transform->mapperTagihan($pasien, $tagihan, $tgl_reg);    
+            $transform = $this->transform->mapperTagihan($pasien, $tagihan, $tgl_reg);
             return response()->jsonApi('00', "Data Tagihan Pasien Ditemukan", $transform);
         }        
     }
@@ -84,18 +78,12 @@ class TagihanController extends Controller
                 "messageError" => "Data Tagihan Pasien tidak di temukan!"
             ];        
             return response()->jsonApi('01', $message["messageError"]);
-        }else if($tagihan=='02'){
-            $message = [
-                "messageError" => "Data Tagihan Pasien Sudah Dibayar"
-            ];        
-            return response()->jsonApi('02', $message["messageError"]);
         }else{
             if (!$tagihan->count()) {               
                 $message = [
-                    "messageError" => "Data Tagihan Pasien tidak di temukan!"
-                ];
-            
-                return response()->jsonApi('01', $message["messageError"]);
+                    "messageError" => "Data Tagihan Pasien Sudah Dibayar"
+                ];        
+                return response()->jsonApi('02', $message["messageError"]);
             }
             $tgl_reg = $r['tanggal_registrasi'];
             $transform = $this->transform->mapperTagihan($pasien, $tagihan, $tgl_reg);    
@@ -125,18 +113,12 @@ class TagihanController extends Controller
                 "messageError" => "Data Tagihan Pasien tidak di temukan!"
             ];        
             return response()->jsonApi('01', $message["messageError"]);
-        }else if($tagihan=='02'){
-            $message = [
-                "messageError" => "Data Tagihan Pasien Sudah Dibayar"
-            ];        
-            return response()->jsonApi('02', $message["messageError"]);
         }else{
             if (!$tagihan->count()) {               
                 $message = [
-                    "messageError" => "Data Tagihan Pasien tidak di temukan!"
-                ];
-            
-                return response()->jsonApi('01', $message["messageError"]);
+                    "messageError" => "Data Tagihan Pasien Sudah Dibayar"
+                ];        
+                return response()->jsonApi('02', $message["messageError"]);
             }
             $tgl_reg = $r['tanggal_registrasi'];
             $transform = $this->transform->mapperTagihan($pasien, $tagihan, $tgl_reg);    

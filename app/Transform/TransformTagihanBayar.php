@@ -9,9 +9,9 @@ class TransformTagihanBayar
     public function mapperTagihanBayar($bayartagihan,$tgl_reg)
     {    
         $data =[];
-        $total = 0; 
+        $total_tunai = 0; 
         foreach($bayartagihan as $val){
-            $total += $val->tunai;
+            $total_tunai += $val->tunai;
             if($val->jenis_rawat =='RJ'){
                 $jns_rawat= "Rawat Jalan";
             }else if($val->jenis_rawat =='RI'){
@@ -26,7 +26,7 @@ class TransformTagihanBayar
                 'nama_pasien' => $val->nama_pasien, 
                 'alamat_pasien' => $val->alamat, 
                 'untuk_pembayaran' =>$val->untuk.' ('.$jns_rawat.')',
-                'total_bayar' =>$total
+                'total_tunai' =>$total_tunai
             ];            
             
             $output[]= [

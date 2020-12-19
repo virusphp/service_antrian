@@ -78,6 +78,7 @@ $router->group(['namespace'  => 'ApiSIMRS', 'middleware' => 'bankjateng'], funct
     $router->get('/tagihan/rj/gettagihan', 'TagihanController@getTagihanRJ');
     $router->get('/tagihan/ri/gettagihan', 'TagihanController@getTagihanRI');
     $router->get('/tagihan/rd/gettagihan', 'TagihanController@getTagihanRD');
+    $router->get('/tagihan/pasien', 'TagihanController@getTagihanPasien');
 });
 
 $router->group(['namespace'  => 'ApiBankJateng', 'middleware' => 'bankjateng'], function() use ($router) {

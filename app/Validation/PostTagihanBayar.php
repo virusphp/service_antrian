@@ -12,7 +12,7 @@ class PostTagihanBayar
         // dd($request);
         return Validator::make($request->all(),[
             'no_rm' => 'required', 
-            'jenis_tagihan' => 'required|'.Rule::in(['RJ','RI','RD']),
+            // 'jenis_tagihan' => 'required|'.Rule::in(['RJ','RI','RD']),
             'nama_pembayar' => 'required', 
             'alamat_pembayar' => 'required',
             'tanggal_registrasi' => 'required|date', 

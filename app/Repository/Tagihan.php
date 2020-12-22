@@ -4,6 +4,8 @@ namespace App\Repository;
 use App\Transform\TransformTagihan;
 use App\Helpers\Waktu;
 use DB;
+ini_set('max_input_vars',5000);
+ini_set('max_input_nesting_level',5000);
 
 class Tagihan
 {
@@ -60,10 +62,10 @@ class Tagihan
             }            
             $noRegPembayar = $data;
             return DB::connection($this->dbsimrs)->table('view_kwitansi as a')
-                ->select(DB::raw("CASE a.Status_Verifikasi WHEN 1 THEN 'SUDAH' ELSE 'BELUM' END as status_verifikasi"),'a.no_bukti','a.tgl_tagihan','a.kelompok','a.nama_tarif','a.harga','a.biaya_jaminan','a.jumlah','a.diskon_rupiah','a.tunai','a.piutang','a.tagihan','a.rek_p','a.rek_p2','a.no_tagihan','a.no_rm','a.no_reg','a.diskon_persen','a.kd_sub_unit','a.posisi','a.kd_dokter','a.Tagihan_A')
+                ->select(DB::raw("CASE a.Status_Verifikasi WHEN 1 THEN 'SUDAH' ELSE 'BELUM' END as status_verifikasi"),'a.no_bukti','a.tgl_tagihan','a.kelompok','a.nama_tarif','a.harga','a.biaya_jaminan','a.jumlah','a.diskon_rupiah','a.tunai','a.piutang','a.tagihan','a.rek_p','a.rek_p2','a.no_tagihan','a.no_rm','a.no_reg','r.no_reg_pembayar','a.diskon_persen','a.kd_sub_unit','a.posisi','a.kd_dokter','a.Tagihan_A')
                 ->join('registrasi as r','a.no_reg','=','r.no_reg')
                 ->whereIn('r.no_reg_pembayar',$noRegPembayar)
-                ->get();                       
+                ->get();  
         }
     }
 
@@ -78,9 +80,9 @@ class Tagihan
             return $response;
         }else if(!$getTagihan->count()){
             // dd('wes dibayar gan');
-            $dataReg = $this->getnoReg($setdata);
-            foreach($dataReg as $key=>$value){
-                $data [$key] = $value->no_reg;
+            $dataRegBayar = $this->getnoRegPembayar($setdata);
+            foreach($dataRegBayar as $key=>$value){
+                $data [$key] = $value->no_reg_pembayar;
             }   
             $noRegPembayar = $data;
             $response= [
@@ -88,7 +90,7 @@ class Tagihan
                 'data' => $this->cariKwitansiByNoreg($noRegPembayar)
             ];
             return $response;
-         }else{                                
+         }else{                                      
             return $this->InsertKwitansi($setdata,$getTagihan);
          }
     }
@@ -105,6 +107,7 @@ class Tagihan
     public function InsertKwitansi($data,$getTagihan)
     {
         $pasien = $this->getPasien($data);
+        // dd($getTagihan);
         $transform = $this->transform->mapperTagihanBayar($pasien, $getTagihan, $data);
         $response= [
             'status' => '00',
@@ -196,7 +199,7 @@ class Tagihan
             foreach($data['tagihan_total'] as $key=>$val){ 
                 $no_kw[]= $this->no_kwitansi($val['jenis_rawat'],$val['int']);               
                 $nokwitansi= $this->no_kwitansi($val['jenis_rawat'],$val['int']);
-                $dataKwHeader = array(
+                $dataKwHeader= array(
                     'no_kwitansi' => $nokwitansi,
                     'nama_pembayar' =>$data['pasien']['nama_pembayar'],
                     'alamat_pembayar' =>$data['pasien']['alamat_pembayar'],
@@ -239,11 +242,11 @@ class Tagihan
                 foreach($data['tagihan_detail'][$key] as $r){
                     $dataKw= array(
                         "no_kwitansi"=>$nokwitansi, 
-                        "jenis_rawat"=>$val['jenis_rawat'], 
+                        "jenis_rawat"=>$r['jenis_rawat'], 
                         "tgl_kwitansi"=>date('Y-m-d'), 
                         "no_bukti"=>$r['no_bukti'], 
                         "no_rm"=>$data['pasien']['no_rm'], 
-                        "no_reg"=>$val['no_reg'], 
+                        "no_reg"=>$r['no_reg'], 
                         "tgl_tagihan"=>$r['tanggal_tagihan'], 
                         "nama_tarif"=>$r['nama_tarif'], 
                         "kelompok"=>$r['kelompok'], 
@@ -267,21 +270,22 @@ class Tagihan
 
                     $update[]= [
                         'no_rm'=> $data['pasien']['no_rm'],
-                        'no_reg' => $val['no_reg'],
+                        'no_reg' => $r['no_reg'],
                         'no_tagihan' => $r['no_tagihan'],
                         'no_bukti' => $r['no_bukti'],
                         'kelompok_tagihan' => $r['kelompok_tagihan'],
                         'no_kwitansi' =>$nokwitansi
-                    ];   
+                    ];  
+                    // dd($dataKw); 
                     DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw); 
                 }  
                 $updateReg[]=[
-                    'no_reg' =>$val['no_reg']
+                    'no_reg_pembayar' =>$val['no_reg']
                 ];
                 DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader); 
-                // dd($dataKwHeader);
+                // dd($dataKw);
             }  
-            // dd($dataKw);
+            // dd($updateReg);
             // $query = DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader);  
             // $query = DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw); 
             // dd($query);
@@ -332,7 +336,7 @@ class Tagihan
     public function updateRegistrasi($value)
     {    
         return DB::connection($this->dbsimrs)->table('Registrasi')
-            ->whereIn('no_reg',$value)
+            ->whereIn('no_reg_pembayar',$value)
             ->update(['Status_keluar'=>1]);
     }
 

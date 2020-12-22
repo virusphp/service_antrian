@@ -45,7 +45,7 @@ class TransformTagihan
                     $retur_obat_tunai +=$val->tunai;
                 }
                 $output2[]= [
-                    'no_reg' => $val->no_reg,
+                    'no_reg' => $val->no_reg,                    
                     'no_tagihan' => $val->no_tagihan,
                     'tanggal_tagihan' => Perubahan::tanggalSekarang($val->tgl_tagihan),
                     'no_bukti' => $val->no_bukti,
@@ -101,7 +101,7 @@ class TransformTagihan
             'nama_pembayar' => $databayar['nama_pembayar'], 
             'alamat_pembayar' => $databayar['alamat_pembayar']
         ];
-        $tagihanPasien = $tagihan->groupBy('no_reg');
+        $tagihanPasien = $tagihan->groupBy('no_reg_pembayar');
         $total_tunai_all=0;
         $total_retur_all=0;
         $total_piutang_all=0;
@@ -127,6 +127,8 @@ class TransformTagihan
                     $retur_obat_tunai +=$val->tunai;
                 }
                 $output2[$key][] = [
+                    'no_reg' => $val->no_reg,
+                    'jenis_rawat' => Perubahan::jenis_rawat($val->no_reg),
                     'no_tagihan' => $val->no_tagihan,
                     'tanggal_tagihan' => Perubahan::tanggalSekarang($val->tgl_tagihan),
                     'no_bukti' => $val->no_bukti,

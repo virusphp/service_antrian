@@ -152,6 +152,7 @@ class TransformTagihan
                 'no_reg' =>$key,
                 'jenis_rawat' => $jenis_rawat,            
                 'total_bayar' => $tunai_tambah - $retur_obat_tunai,
+                'total_tunai' => $tunai_tambah,
                 'total_piutang' => $piutang_tambah - $piutang_kurang,
                 'total_tagihan' => $tagihan_tambah - $tagihan_kurang + $retur_obat_tunai,
                 'retur_obat' => $retur_obat_tunai,

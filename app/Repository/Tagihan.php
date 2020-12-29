@@ -80,9 +80,10 @@ class Tagihan
             return $response;
         }else if(!$getTagihan->count()){
             // dd('wes dibayar gan');
-            $dataRegBayar = $this->getnoRegPembayar($setdata);
+            $dataRegBayar = $this->getnoReg($setdata);
             foreach($dataRegBayar as $key=>$value){
-                $data [$key] = $value->no_reg_pembayar;
+                // $data [$key] = $value->no_reg_pembayar;
+                $data[$key] = $value->no_reg;
             }   
             $noRegPembayar = $data;
             $response= [
@@ -97,9 +98,10 @@ class Tagihan
 
     public function cariKwitansiByNoreg($params)
     {
-        $getKw = DB::connection($this->dbsimrs)->table('Kwitansi_Header')
-                ->select('no_kwitansi','nama_pembayar','alamat_pembayar','untuk','tgl_kwitansi','jenis_rawat','no_rm','no_reg','nama_pasien','alamat','jenis_pasien','nama_penjamin','grandtotal_tunai as tunai')
-                ->whereIn('no_reg',$params)
+        $getKw = DB::connection($this->dbsimrs)->table('Kwitansi as kw')
+                ->select('kwh.no_kwitansi','kwh.nama_pembayar','kwh.alamat_pembayar','kwh.untuk','kwh.tgl_kwitansi','kwh.jenis_rawat','kwh.no_rm','kw.no_reg','kwh.nama_pasien','kwh.alamat','kwh.grandtotal_tunai','kw.no_bukti','kw.nama_tarif','kw.kelompok','kw.harga','kw.tunai','kw.tagihan')
+                ->join('kwitansi_header as kwh','kw.no_kwitansi','=','kwh.no_kwitansi')
+                ->whereIn('kw.no_reg',$params)
                 ->get();
         return $getKw;
     }
@@ -196,8 +198,6 @@ class Tagihan
         // dd($data);
         DB::beginTransaction();
         try {  
-            // $dataKwHeader=[];
-            // $dataKw=[];
             foreach($data['tagihan_total'] as $key=>$val){ 
                 $no_kw[]= $this->no_kwitansi($val['jenis_rawat'],$val['int']);               
                 $nokwitansi= $this->no_kwitansi($val['jenis_rawat'],$val['int']);
@@ -271,13 +271,32 @@ class Tagihan
                     );
 
                     $update[]= [
-                        'no_rm'=> $data['pasien']['no_rm'],
+                        'no_rm'=> $data['pasien']['no_rm'],                        
                         'no_reg' => $r['no_reg'],
                         'no_tagihan' => $r['no_tagihan'],
                         'no_bukti' => $r['no_bukti'],
                         'kelompok_tagihan' => $r['kelompok_tagihan'],
                         'no_kwitansi' =>$nokwitansi
                     ];  
+
+                    $bayarKwDetail[]=[
+                        'no_kwitansi' => $nokwitansi,
+                        'tgl_kwitansi' =>date('Y-m-d'),
+                        'no_rm'=> $data['pasien']['no_rm'], 
+                        'nama_pembayar' =>$data['pasien']['nama_pembayar'],
+                        'alamat_pembayar' =>$data['pasien']['alamat_pembayar'],
+                        'nama_pasien' =>$data['pasien']['nama_pasien'],
+                        'alamat' =>$data['pasien']['alamat_pasien'],
+                        "no_bukti"=>$r['no_bukti'], 
+                        'untuk' =>'Pembayaran Biaya Tagihan Rumah Sakit',
+                        'kelompok' => $r['kelompok'],
+                        'jenis_rawat' =>$val['jenis_rawat'],
+                        "nama_tarif"=>$r['nama_tarif'], 
+                        "harga"=>$r['harga'],
+                        "tunai"=>$r['tunai'], 
+                        "tagihan"=>$r['tagihan'],
+                        'total_tunai' =>$val['total_bayar'],
+                    ];
                     // dd($dataKw); 
                     DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw); 
                 }  
@@ -287,16 +306,17 @@ class Tagihan
                 DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader); 
                 // dd($dataKw);
             }  
-            // dd($dataKw);
+            // return $bayarKwDetail;
             // $query = DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader);  
             // $query = DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw); 
             // dd($query);
             $this->deleteTotalTagihanPasien($update);           
-            $this->updateTagihanPasien($update);            
+            $this->updateTagihanPasien($update);      
+            // dd('masuk sini gaes');    
             $query = $this->updateRegistrasi($updateReg); 
             DB::commit();
             if($query){                
-                return $this->getKwitansiBayar($no_kw);
+                return $bayarKwDetail;
             }
             else{
                 DB::rollback();
@@ -337,6 +357,7 @@ class Tagihan
 
     public function updateRegistrasi($value)
     {    
+        // dd($value);
         return DB::connection($this->dbsimrs)->table('Registrasi')
             ->whereIn('no_reg_pembayar',$value)
             ->update(['Status_keluar'=>1]);

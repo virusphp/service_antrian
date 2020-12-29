@@ -85,7 +85,7 @@ class TransformTagihan
         ];
         $data['tagihan_total'] = $output3;  
         $data['tagihan'] = $output;
-        $data['tagihan_detail'] = $output2;        
+        // $data['tagihan_detail'] = $output2;        
         return $data;
 
     }

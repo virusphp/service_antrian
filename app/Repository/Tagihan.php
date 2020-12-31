@@ -194,10 +194,11 @@ class Tagihan
     // }
    
     public function InsertKwitansiHeader($data)
-    {  
-        // dd($data);
+    {   
+        // dd($data);      
         DB::beginTransaction();
         try {  
+            $total_bayar =0;
             foreach($data['tagihan_total'] as $key=>$val){ 
                 $no_kw[]= $this->no_kwitansi($val['jenis_rawat'],$val['int']);               
                 $nokwitansi= $this->no_kwitansi($val['jenis_rawat'],$val['int']);
@@ -294,8 +295,9 @@ class Tagihan
                         "nama_tarif"=>$r['nama_tarif'], 
                         "harga"=>$r['harga'],
                         "tunai"=>$r['tunai'], 
+                        'piutang' => $val['total_piutang'],
                         "tagihan"=>$r['tagihan'],
-                        'total_tunai' =>$val['total_bayar'],
+                        "total_bayar" =>$val['total_bayar']
                     ];
                     // dd($dataKw); 
                     DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw); 
@@ -306,16 +308,11 @@ class Tagihan
                 DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader); 
                 // dd($dataKw);
             }  
-            // return $bayarKwDetail;
-            // $query = DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader);  
-            // $query = DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw); 
-            // dd($query);
             $this->deleteTotalTagihanPasien($update);           
-            $this->updateTagihanPasien($update);      
-            // dd('masuk sini gaes');    
+            $this->updateTagihanPasien($update);    
             $query = $this->updateRegistrasi($updateReg); 
-            DB::commit();
-            if($query){                
+            DB::commit();            
+            if($query > 0){      
                 return $bayarKwDetail;
             }
             else{

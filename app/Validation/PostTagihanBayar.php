@@ -15,7 +15,7 @@ class PostTagihanBayar
             // 'jenis_tagihan' => 'required|'.Rule::in(['RJ','RI','RD']),
             'nama_pembayar' => 'required', 
             'alamat_pembayar' => 'required',
-            'tanggal_registrasi' => 'required|date', 
+            // 'tanggal_registrasi' => 'required|date', 
             // 'pasien.nama_pasien' => 'required', 
             // 'pasien.alamat_pasien' => 'required', 
             

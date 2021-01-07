@@ -10,6 +10,7 @@ ini_set('max_input_nesting_level',5000);
 class Tagihan
 {
     protected $dbsimrs = "sql_simrs";
+    protected $tahun ="2020";
 
     public function __construct()
     {
@@ -32,10 +33,8 @@ class Tagihan
     {   
         return DB::connection($this->dbsimrs)->table('registrasi')
             ->select('no_reg')
-            ->where([
-                ['no_rm', $params['no_rm']],
-                ['tgl_reg', $params['tanggal_registrasi']],
-            ])
+            ->where('no_rm', $params['no_rm'])
+            ->whereYear('tgl_reg','>=',$this->tahun)
             ->get();
     }
 
@@ -43,11 +42,19 @@ class Tagihan
     {   
         return DB::connection($this->dbsimrs)->table('registrasi')
             ->select('no_reg_pembayar')
-            ->where([
-                ['no_rm', $params['no_rm']],
-                ['tgl_reg', $params['tanggal_registrasi']],
-            ])
+            ->where('no_rm', $params['no_rm'])
+            ->whereYear('tgl_reg','>=',$this->tahun)
             ->groupBy('no_reg_pembayar')
+            ->get();
+    }
+
+    public function getnoRegSudahBayar($params)
+    {   
+        return DB::connection($this->dbsimrs)->table('registrasi')
+            ->select('no_reg')
+            ->where('no_rm', $params['no_rm'])
+            ->whereYear('tgl_reg','>=',$this->tahun)
+            ->orderBy('tgl_reg','DESC')
             ->get();
     }
 
@@ -62,7 +69,7 @@ class Tagihan
             }            
             $noRegPembayar = $data;
             return DB::connection($this->dbsimrs)->table('view_kwitansi as a')
-                ->select(DB::raw("CASE a.Status_Verifikasi WHEN 1 THEN 'SUDAH' ELSE 'BELUM' END as status_verifikasi"),'a.no_bukti','a.tgl_tagihan','a.kelompok','a.nama_tarif','a.harga','a.biaya_jaminan','a.jumlah','a.diskon_rupiah','a.tunai','a.piutang','a.tagihan','a.rek_p','a.rek_p2','a.no_tagihan','a.no_rm','a.no_reg','r.no_reg_pembayar','a.diskon_persen','a.kd_sub_unit','a.posisi','a.kd_dokter','a.Tagihan_A')
+                ->select(DB::raw("CASE a.Status_Verifikasi WHEN 1 THEN 'SUDAH' ELSE 'BELUM' END as status_verifikasi"),'a.no_bukti','a.tgl_tagihan','a.kelompok','a.nama_tarif','a.harga','a.biaya_jaminan','a.jumlah','a.diskon_rupiah','a.tunai','a.piutang','a.tagihan','a.rek_p','a.rek_p2','a.no_tagihan','a.no_rm','a.no_reg','r.no_reg_pembayar','r.tgl_reg','a.diskon_persen','a.kd_sub_unit','a.posisi','a.kd_dokter','a.Tagihan_A')
                 ->join('registrasi as r','a.no_reg','=','r.no_reg')
                 ->whereIn('r.no_reg_pembayar',$noRegPembayar)
                 ->get();  
@@ -79,19 +86,18 @@ class Tagihan
             ];
             return $response;
         }else if(!$getTagihan->count()){
-            // dd('wes dibayar gan');
-            $dataRegBayar = $this->getnoReg($setdata);
-            foreach($dataRegBayar as $key=>$value){
-                // $data [$key] = $value->no_reg_pembayar;
-                $data[$key] = $value->no_reg;
-            }   
-            $noRegPembayar = $data;
+            // $dataRegBayar = $this->getnoRegSudahBayar($setdata);
+            // foreach($dataRegBayar as $key=>$value){
+            //     // $data [$key] = $value->no_reg_pembayar;
+            //     $data[$key] = $value->no_reg;
+            // }   
+            // $noRegPembayar = $data;
             $response= [
                 'status' => '02',
-                'data' => $this->cariKwitansiByNoreg($noRegPembayar)
+                // 'data' => $this->cariKwitansiByNoreg($noRegPembayar)
             ];
             return $response;
-         }else{                                      
+         }else{                                    
             return $this->InsertKwitansi($setdata,$getTagihan);
          }
     }
@@ -109,7 +115,6 @@ class Tagihan
     public function InsertKwitansi($data,$getTagihan)
     {
         $pasien = $this->getPasien($data);
-        // dd($getTagihan);
         $transform = $this->transform->mapperTagihanBayar($pasien, $getTagihan, $data);
         $response= [
             'status' => '00',
@@ -117,91 +122,15 @@ class Tagihan
         ];
         return $response;
     }
-
-    // public function getnoReg($params,$jnsrawat)
-    // {   
-    //     $cariReg = DB::connection($this->dbsimrs)->table('registrasi')
-    //             ->select('no_reg','jns_rawat','status_keluar')
-    //             ->where([
-    //                 ['no_rm', $params['no_rm']],
-    //                 ['tgl_reg', $params['tanggal_registrasi']],
-    //                 ['jns_rawat',$jnsrawat]
-    //             ])
-    //             ->orderBy('status_keluar', 'DESC')
-    //             ->get();
-    //     return $cariReg;
-    // }
-
-    // public function getTagihanRJ($params)
-    // {                
-    //     $dataReg = $this->getnoReg($params,1);
-    //     if(!$dataReg->count()){
-    //         return "01";
-    //     }else{  
-    //         foreach($dataReg as $key=>$value){
-    //             $data [$key] = $value->no_reg;
-    //             // $data2 [$key] = $value->status_keluar;
-    //         }            
-    //         $noReg = $data;
-    //         return DB::connection($this->dbsimrs)->table('view_kwitansi as k')
-    //             ->select('k.no_tagihan','k.Tagihan_A','k.kelompok','k.no_bukti','k.no_reg','k.tgl_tagihan','k.nama_tarif','k.kelompok','k.harga','k.tunai','k.piutang','k.tagihan','k.posisi','k.rek_p','k.rek_p2','k.jumlah','k.kd_dokter','k.kd_sub_unit')
-    //             ->where('k.no_rm', $params['no_rm'])
-    //             ->whereIn('k.no_reg',$noReg)
-    //             ->where('k.no_reg','like','01%')
-    //             ->get();
-                       
-    //     }
-    // }
-
-    // public function getTagihanRI($params)
-    // {   
-    //     $dataReg = $this->getnoReg($params,2);
-    //     if(!$dataReg->count()){
-    //         return "01";
-    //     }else{  
-    //         foreach($dataReg as $key=>$value){
-    //             $data [$key] = $value->no_reg;
-    //             // $data2 [$key] = $value->status_keluar;
-    //         }            
-    //         $noReg = $data;
-    //         return DB::connection($this->dbsimrs)->table('view_kwitansi as k')
-    //             ->select('k.no_tagihan','k.Tagihan_A','k.kelompok','k.no_bukti','k.no_reg','k.tgl_tagihan','k.nama_tarif','k.kelompok','k.harga','k.tunai','k.piutang','k.tagihan','k.posisi','k.rek_p','k.rek_p2','k.jumlah','k.kd_dokter','k.kd_sub_unit')
-    //             ->where('k.no_rm', $params['no_rm'])
-    //             ->whereIn('k.no_reg',$noReg)
-    //             ->where('k.no_reg','like','02%')
-    //             ->get();
-    //     }
-    // }
-
-    // public function getTagihanRD($params)
-    // {
-    //     $dataReg = $this->getnoReg($params,3);
-    //     if(!$dataReg->count()){
-    //         return "01";
-    //     }else{  
-    //         foreach($dataReg as $key=>$value){
-    //             $data [$key] = $value->no_reg;
-    //             // $data2 [$key] = $value->status_keluar;
-    //         }            
-    //         $noReg = $data;
-    //         return DB::connection($this->dbsimrs)->table('view_kwitansi as k')
-    //             ->select('k.no_tagihan','k.Tagihan_A','k.kelompok','k.no_bukti','k.no_reg','k.tgl_tagihan','k.nama_tarif','k.kelompok','k.harga','k.tunai','k.piutang','k.tagihan','k.posisi','k.rek_p','k.rek_p2','k.jumlah','k.kd_dokter','k.kd_sub_unit')
-    //             ->where('k.no_rm', $params['no_rm'])
-    //             ->whereIn('k.no_reg',$noReg)
-    //             ->where('k.no_reg','like','03%')
-    //             ->get();
-    //     }
-    // }
    
     public function InsertKwitansiHeader($data)
-    {   
-        // dd($data);      
+    {       
         DB::beginTransaction();
         try {  
             $total_bayar =0;
             foreach($data['tagihan_total'] as $key=>$val){ 
-                $no_kw[]= $this->no_kwitansi($val['jenis_rawat'],$val['int']);               
-                $nokwitansi= $this->no_kwitansi($val['jenis_rawat'],$val['int']);
+                $no_kw[]= $this->no_kwitansi($val['jenis_rawat']);               
+                $nokwitansi= $this->no_kwitansi($val['jenis_rawat']);
                 $dataKwHeader= array(
                     'no_kwitansi' => $nokwitansi,
                     'nama_pembayar' =>$data['pasien']['nama_pembayar'],
@@ -222,7 +151,7 @@ class Tagihan
                     'piutang' =>$val['total_piutang'],
                     'tagihan' =>$val['total_tagihan'],
                     'retur_obat_tunai' =>$val['retur_obat'],
-                    'retur_obat_piutang' =>'',
+                    'retur_obat_piutang' =>0,
                     'potongan' =>'',
                     'grandtotal_tunai' =>$val['total_bayar'],
                     'grandtotal_piutang' =>$val['total_piutang'],
@@ -299,19 +228,17 @@ class Tagihan
                         "tagihan"=>$r['tagihan'],
                         "total_bayar" =>$val['total_bayar']
                     ];
-                    // dd($dataKw); 
                     DB::connection($this->dbsimrs)->table('Kwitansi')->insert($dataKw); 
                 }  
                 $updateReg[]=[
                     'no_reg_pembayar' =>$val['no_reg']
                 ];
-                DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader); 
-                // dd($dataKw);
-            }  
+               DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader); 
+            }
             $this->deleteTotalTagihanPasien($update);           
             $this->updateTagihanPasien($update);    
             $query = $this->updateRegistrasi($updateReg); 
-            DB::commit();            
+            DB::commit();       
             if($query > 0){      
                 return $bayarKwDetail;
             }
@@ -335,7 +262,7 @@ class Tagihan
         return $getKw;
     }
 
-    public function no_kwitansi($jns_rawat,$key)
+    public function no_kwitansi($jns_rawat)
     {
         $jenis =  "K".$jns_rawat.date('dmy');       
         $query = DB::connection($this->dbsimrs)->table('kwitansi_header')
@@ -343,12 +270,12 @@ class Tagihan
                 ->max('no_kwitansi');
         $noUrut = (int) substr($query, 9, 4);
         $noUrut++;
-        if($key > 0){
-            $noUrutBaru = $noUrut+$key;
-        }else{
-            $noUrutBaru = $noUrut;
-        } 
-        $newID = $jenis . sprintf("%04s", $noUrutBaru).'00';
+        // if($key > 0){
+        //     $noUrutBaru = $noUrut+$key;
+        // }else{
+        //     $noUrutBaru = $noUrut;
+        // } 
+        $newID = $jenis . sprintf("%04s", $noUrut).'00';
         return $newID; 
     }
 

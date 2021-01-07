@@ -23,6 +23,11 @@ class Perubahan
         return date('Y-m-d', strtotime($nilai));
     }
 
+    public static function tanggalIndo($nilai)
+    {
+        return date('d-m-Y', strtotime($nilai));
+    }
+
     public static function jenis_rawat($nilai)
     {
         $hasil = substr($nilai,0,2);
@@ -40,5 +45,19 @@ class Perubahan
     public static function ribuan($nilai)
     {
         return number_format($nilai, "2",",",".");
+    }
+
+    function array_group($key, $data) {
+        $result = array();
+    
+        foreach($data as $val) {
+            if(array_key_exists($key, $val)){
+                $result[$val[$key]][] = $val;
+            }else{
+                $result[""][] = $val;
+            }
+        }
+    
+        return $result;
     }
 }

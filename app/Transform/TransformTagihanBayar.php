@@ -6,8 +6,8 @@ use App\Helpers\Perubahan;
 
 class TransformTagihanBayar
 {
-    public function mapperTagihanBayarInsert($bayartagihan,$tgl_reg)
-    {            
+    public function mapperTagihanBayarInsert($bayartagihan)
+    {   
         $data =[];
         $total_bayar=0;
         $bayartagihanCollect = collect($bayartagihan);
@@ -22,14 +22,16 @@ class TransformTagihanBayar
                 }else{
                     $jns_rawat= "Rawat Gawat Darurat";
                 }
+               
                 $data['pembayaran']= [
                     'no_rm' => $val['no_rm'],                 
                     'nama_pembayar' => $val['nama_pembayar'], 
                     'alamat_pembayar' => $val['alamat_pembayar'], 
                     'nama_pasien' => $val['nama_pasien'], 
                     'alamat_pasien' => $val['alamat'], 
-                    'untuk_pembayaran' =>$val['untuk'].' ('.$jns_rawat.')',
+                    'untuk_pembayaran' =>$val['untuk'].' ('.$jns_rawat.')', 
                 ]; 
+               
                 $output[]= [
                     'no_kwitansi' => $val['no_kwitansi'],
                     'tanggal_kwitansi' => Perubahan::tanggalSekarang($val['tgl_kwitansi']),
@@ -43,15 +45,17 @@ class TransformTagihanBayar
                 $bayar = $val['total_bayar'];
             }
             $total_bayar +=$bayar;
+            $no_kw[]=$key;
             
-        }  
+        } 
         $data['pembayaran']['total_bayar'] = (float)$total_bayar;
-        $data['rincian_pembayaran'] = $output;  
+        $data['pembayaran']['no_kwitansi'] = $no_kw;
+        $data['rincian_pembayaran']= $output;
         return $data;
         
     }
 
-    public function mapperTagihanBayarLunas($bayartagihan,$tgl_reg)
+    public function mapperTagihanBayarLunas($bayartagihan)
     { 
         $data =[];
         $total_bayar = 0; 

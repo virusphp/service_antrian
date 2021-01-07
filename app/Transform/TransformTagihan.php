@@ -8,12 +8,11 @@ use phpDocumentor\Reflection\Types\Float_;
 class TransformTagihan
 {
 
-    public function mapperTagihan($pasien, $tagihan, $tgl_reg)
+    public function mapperTagihan($pasien, $tagihan)
     {
         $data = [];
         $data['pasien'] = [
             'no_rm' => trim($pasien->no_rm), 
-            'tanggal_registrasi' => $tgl_reg,
             'nama_pasien' => $pasien->nama_pasien, 
             'alamat_pasien' => $pasien->alamat.', RT '.$pasien->rt.' RW '.$pasien->rw.' Kel. '.$pasien->nama_kelurahan.' Kec.'.$pasien->nama_kecamatan.' Kab.'.$pasien->nama_kabupaten.' Prov.'.$pasien->nama_propinsi, 
             'jenis_kelamin_pasien' => Perubahan::jenisKelamin($pasien->jns_kel), 
@@ -63,9 +62,11 @@ class TransformTagihan
                     'akun_rek2' => $val->rek_p2
                 ];      
                 $jenis_rawat =  Perubahan::jenis_rawat($val->no_reg); 
+                $tgl_reg = Perubahan::tanggalIndo($val->tgl_reg);
             }                   
             $output[] = [    
                 'no_reg' =>$key,
+                'tanggal_registrasi' => $tgl_reg,
                 'jenis_rawat' => $jenis_rawat,            
                 'total_bayar' => $tunai_tambah - $retur_obat_tunai,
                 'total_piutang' => $piutang_tambah - $piutang_kurang,
@@ -94,8 +95,7 @@ class TransformTagihan
     {
         $data = [];       
         $data['pasien'] = [
-            'no_rm' => trim($pasien->no_rm), 
-            'tanggal_registrasi' => $databayar['tanggal_registrasi'],
+            'no_rm' => trim($pasien->no_rm),             
             'nama_pasien' => $pasien->nama_pasien, 
             'alamat_pasien' => $pasien->alamat.', RT '.$pasien->rt.' RW '.$pasien->rw.' Kel. '.$pasien->nama_kelurahan.' Kec.'.$pasien->nama_kecamatan.' Kab.'.$pasien->nama_kabupaten.' Prov.'.$pasien->nama_propinsi, 
             'nama_pembayar' => $databayar['nama_pembayar'], 
@@ -146,10 +146,12 @@ class TransformTagihan
                     'akun_rek2' => $val->rek_p2
                 ];            
                 $jenis_rawat =  Perubahan::jenis_rawat($val->no_reg); 
+                $tgl_reg = Perubahan::tanggalIndo($val->tgl_reg);
             }
             
             $output[$key] = [    
                 'no_reg' =>$key,
+                'tanggal_registrasi' => $tgl_reg,
                 'jenis_rawat' => $jenis_rawat,            
                 'total_bayar' => $tunai_tambah - $retur_obat_tunai,
                 'total_tunai' => $tunai_tambah,

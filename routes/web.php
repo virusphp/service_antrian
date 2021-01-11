@@ -73,15 +73,7 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
 });
 
 // ----------------- API BRIDGING BANK JATENG
-$router->group(['namespace'  => 'ApiSIMRS', 'middleware' => 'bankjateng'], function() use ($router) {
-    // $router->get('/tagihanpasien/{noRM}', 'BankJatengController@tagihanPasien');
-    $router->get('/tagihan/rj/gettagihan', 'TagihanController@getTagihanRJ');
-    $router->get('/tagihan/ri/gettagihan', 'TagihanController@getTagihanRI');
-    $router->get('/tagihan/rd/gettagihan', 'TagihanController@getTagihanRD');
-    $router->get('/tagihan/pasien', 'TagihanController@getTagihanPasien');
-});
-
 $router->group(['namespace'  => 'ApiBankJateng', 'middleware' => 'bankjateng'], function() use ($router) {
-    // $router->get('/tagihanpasien/{noRM}', 'BankJatengController@tagihanPasien');
+    $router->post('/tagihan/pasien', 'TagihanController@getTagihanPasien');
     $router->post('/tagihan/bayartagihan', 'BankJatengController@bayarTagihan');
 });

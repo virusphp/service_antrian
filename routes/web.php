@@ -21,6 +21,24 @@ $router->group(['namespace'  => 'ApiSSO'], function() use ($router) {
     $router->post('/access/login', 'LoginPlatformController@Login');
 });
 
+// -------------------------- API SIMRS
+$router->group(['namespace'  => 'ApiSIMRS'], function() use ($router) {
+    // API  UNTUK ANDROID 
+    $router->group(['namespace' => 'Android'], function() use ($router) {
+        $router->post('/registrasi/user/pasien', 'RegistrasiAndroidController@RegistrasiAndroid');
+    });
+    
+    // API UNTUK APM ANJUNGAN MANDIRI
+    $router->get('/data/registrasi/{noRm}', 'ApmController@dataRegistrasi');
+    //  TEMPAT TIDUR
+    $router->get('/list/tempattidur/kemkes', 'KamarController@getListKamarKemkes');
+    $router->get('/list/tempattidur/siranap', 'KamarController@getListKamarSiranap');
+    $router->get('/list/tempattidur/siranap/xml', 'KamarController@getListKamarSiranapXml');
+
+    $router->get('/pasien/biodata/norm/{noRm}', 'PasienController@getBiodataPasien');
+});
+
+
 // ------------------- REGISTRASI POLIKLINIK MULTI PLATFORM
 $router->group(['namespace' => 'ApiSIMRS', 'middleware' => 'bpjs'], function() use ($router) {    
     $router->post('/antrian/registrasi/via/bpjs', 'AntrianController@Register');
@@ -69,18 +87,59 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
 
     // ---------------------- SEP ---------------------------------//
     $router->get('/sep/{noSep}', 'SepController@CariSep');
+    $router->delete('/sep/delete', 'SepController@DeleteSep');
+
+    // ---------------------- SEP ---------------------------------//
+    $router->delete('/rujukan/delete', 'RujukanController@DeleteRujukan');
 
 });
 
+// ----------------- API BRIDGING SIRS ONLINE
+$router->group(['namespace'  => 'ApiKemkes'], function() use ($router) {
+    // Api Referensi
+    $router->get('/referensi/tempattidur', 'ReferensiController@referensiTempatTidur');
+    $router->get('/referensi/usiameninggal', 'ReferensiController@referensiUsiaMeninggal');
+    $router->get('/referensi/kebutuhansdm', 'ReferensiController@referensiKebutuhanSDM');
+    $router->get('/referensi/kebutuhanapd', 'ReferensiController@referensiKebutuhanAPD');
+
+    //  Api Tempat tidur
+    $router->get('/fasyankes/list/tempattidur', 'BedController@getTempatTidur');
+    $router->post('/fasyankes/post/tempattidur', 'BedController@postTempatTidur');
+
+    // Api Rekap Pasien 
+    $router->get('/laporan/list/pasienmasuk', 'RekapPasienController@getPasienMasuk');
+    $router->post('/laporan/post/pasienmasuk', 'RekapPasienController@postPasienMasuk');
+
+    $router->get('/laporan/list/pasiendirawatkomorbid', 'RekapPasienController@getPasienKomorbid');
+    $router->post('/laporan/post/pasiendirawatkomorbid', 'RekapPasienController@postPasienKomorbid');
+
+    $router->get('/laporan/list/pasiendirawattanpakomorbid', 'RekapPasienController@getPasienTanpaKomorbid');
+    $router->post('/laporan/post/pasiendirawattanpakomorbid', 'RekapPasienController@postPasienTanpaKomorbid');
+
+    $router->get('/laporan/list/pasienkeluar', 'RekapPasienController@getPasienKeluar');
+    $router->post('/laporan/post/pasienkeluar', 'RekapPasienController@postPasienKeluar');
+
+    // Api SDM
+    $router->get('/list/sdm', 'SdmController@getSDM');
+    $router->post('/post/sdm', 'SdmController@postSDM');
+    $router->put('/put/sdm', 'SdmController@updateSDM');
+    $router->delete('/delete/sdm', 'SdmController@deleteSDM');
+
+     // Api APD
+     $router->get('/list/apd', 'ApdController@getAPd');
+     $router->post('/post/apd', 'ApdController@postAPD');
+     $router->put('/put/apd', 'ApdController@updateAPD');
+     $router->delete('/delete/apd', 'ApdController@deleteAPD');
+});
+
+
 // ----------------- API BRIDGING BANK JATENG
 $router->group(['namespace'  => 'ApiSIMRS', 'middleware' => 'bankjateng'], function() use ($router) {
-    // $router->get('/tagihanpasien/{noRM}', 'BankJatengController@tagihanPasien');
     $router->get('/tagihan/rj/gettagihan', 'TagihanController@getTagihanRJ');
     $router->get('/tagihan/ri/gettagihan', 'TagihanController@getTagihanRI');
     $router->get('/tagihan/rd/gettagihan', 'TagihanController@getTagihanRD');
 });
 
 $router->group(['namespace'  => 'ApiBankJateng', 'middleware' => 'bankjateng'], function() use ($router) {
-    // $router->get('/tagihanpasien/{noRM}', 'BankJatengController@tagihanPasien');
     $router->post('/tagihan/bayartagihan', 'BankJatengController@bayarTagihan');
 });

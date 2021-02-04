@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Helpers\BPJSHelper;
+use App\Helpers\Perubahan;
 use App\Helpers\Waktu;
 use App\Http\Controllers\BridgingBPJS\RujukanController;
 use App\Service\Bpjs\Bridging;
@@ -33,6 +34,18 @@ class Antrian
         $postRekap = $this->getRekapAntrian($params);
 
         return $postRekap;
+    }
+
+    public function dataAntrian($params)
+    {
+        return DB::connection($this->dbsimrs)->select("
+            SELECT noantrian FROM (
+                SELECT
+                ROW_NUMBER() OVER (ORDER BY rj.no_reg ASC) AS noantrian, rj.no_reg, rj.kd_poliklinik
+                FROM Registrasi as r inner join Rawat_Jalan as rj on r.no_reg=rj.no_reg where rj.kd_poliklinik='".$params->kd_poliklinik."' and r.tgl_reg = '".Perubahan::tanggalSekarang($params->tgl_reg)."'
+            )  AS regis_pasien
+            WHERE no_reg = '".$params->no_reg."'
+            ");
     }
 
     private function getRekapAntrian($params)
@@ -510,4 +523,5 @@ class Antrian
 
         return $statusPenunjung;
     }
+
 }

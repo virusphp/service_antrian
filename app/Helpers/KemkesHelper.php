@@ -3,15 +3,8 @@
 namespace App\Helpers;
 date_default_timezone_set('UTC');
 
-class BPJSHelper
+class KemkesHelper
 {
-    public static function signature($cusid, $secid)
-    {
-        $timestamps = strval(time()-strtotime('1970-01-01 00:00:00'));
-        $ensig = hash_hmac('sha256', $cusid."&".$timestamps, $secid, true);
-        $signature = base64_encode($ensig);
-        return $signature;
-    }
 
     public static function timestamp()
     {

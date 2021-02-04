@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BridgingBPJS;
 
 use App\Service\Bpjs\Bridging;
+use Illuminate\Http\Request;
 
 class SepController extends BpjsController
 {
@@ -21,10 +22,19 @@ class SepController extends BpjsController
         return $sep;
     }
 
-    public function InsertSep($dataJson)
+    public function InsertSep(Request $request)
     {
-        $endpoint = "SEP/1.1/insert";
+        $dataJson = $request->all();
+        $endpoint = "SEP/1.1/insert"; 
         $sep = $this->bpjs->postRequest($endpoint, $dataJson);
+        return $sep;
+    }
+
+    public function DeleteSep(Request $request)
+    {
+        $dataJson = $request->all();
+        $endpoint = "SEP/delete";
+        $sep = $this->bpjs->deleteRequest($endpoint, $dataJson);
         return $sep;
     }
 }

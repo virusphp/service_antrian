@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Service\Bpjs;
+namespace App\Service\Kemkes;
 
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\RequestException;
 
-class Bridging extends Bpjs
+class Bridging extends Kemkes
 {
 
     protected $headers;
 
-    public function __construct($consid, $timestamp, $signature)
+    public function __construct($rsid, $passid, $timestamp)
     {
-        parent::__construct($consid, $timestamp, $signature);
+        parent::__construct($rsid, $passid, $timestamp);
         $urlencode = array('Content-Type' => 'Application/x-www-form-urlencoded');
         $this->headers = array_merge($this->header, $urlencode);
     }
@@ -20,7 +20,8 @@ class Bridging extends Bpjs
     public function getRequest($endpoint)
     {
         try {
-            $url = $this->bpjs_url . $endpoint;
+            $url = $this->kemkes_url . $endpoint;
+            // dd($url);
             $response = $this->client->get($url, ['headers' => $this->header]);
             $result = $response->getBody()->getContents();
             return $result;
@@ -36,7 +37,7 @@ class Bridging extends Bpjs
     {
         $data = file_get_contents("php://input");
         try {
-            $url = $this->bpjs_url . $endpoint;
+            $url = $this->kemkes_url . $endpoint;
             $result = $this->client->post($url, ['headers' => $this->headers, 'body' => $data]);
             return $result;
         } catch (RequestException $e) {
@@ -51,7 +52,7 @@ class Bridging extends Bpjs
     {
         $data = file_get_contents("php://input");
         try {
-            $url = $this->bpjs_url . $endpoint;
+            $url = $this->kemkes_url . $endpoint;
             $result = $this->client->put($url, ['headers' => $this->headers, 'body' => $data]);
             return $result;
         } catch (RequestException $e) {
@@ -67,7 +68,7 @@ class Bridging extends Bpjs
         $data = file_get_contents("php://input");
         // dd($data, $this->header, $endpoint);
         try {
-            $url = $this->bpjs_url . $endpoint;
+            $url = $this->kemkes_url . $endpoint;
             $result = $this->client->delete($url, ['headers' => $this->headers, 'body' => $data]);
             $response = $result->getBody();
             return $response;

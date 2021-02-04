@@ -61,6 +61,7 @@ $app->singleton(
 
 $app->configure('app');
 $app->configure('bpjs');
+$app->configure('kemkes');
 
 /*
 |--------------------------------------------------------------------------

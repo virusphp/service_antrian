@@ -3,6 +3,7 @@
 namespace App\Transform;
 
 use App\Helpers\Perubahan;
+use Illuminate\Support\Str;
 use phpDocumentor\Reflection\Types\Float_;
 
 class TransformTagihan
@@ -16,7 +17,7 @@ class TransformTagihan
             'nama_pasien' => $pasien->nama_pasien, 
             'alamat_pasien' => $pasien->alamat.', RT '.$pasien->rt.' RW '.$pasien->rw.' Kel. '.$pasien->nama_kelurahan.' Kec.'.$pasien->nama_kecamatan.' Kab.'.$pasien->nama_kabupaten.' Prov.'.$pasien->nama_propinsi, 
             'jenis_kelamin_pasien' => Perubahan::jenisKelamin($pasien->jns_kel), 
-            'usia_pasien'  => Perubahan::usia($pasien->tgl_lahir),
+            'usia_pasien'  => (String)Perubahan::usia($pasien->tgl_lahir),
             'tanggal_lahir_pasien' => Perubahan::tanggalSekarang($pasien->tgl_lahir),
         ];
         $tagihanPasien = $tagihan->groupBy('no_reg');        
@@ -50,12 +51,12 @@ class TransformTagihan
                     'no_bukti' => $val->no_bukti,
                     'kelompok_tagihan' => $val->Tagihan_A,
                     'kelompok' => $val->kelompok,                   
-                    'jumlah'=> (int)$val->jumlah,
+                    'jumlah'=> $val->jumlah,
                     'nama_tarif' => $val->nama_tarif,
-                    'harga' => (Float)$val->harga,
-                    'tunai' => (Float)$val->tunai,
-                    'piutang' => (Float)$val->piutang,
-                    'tagihan' => (Float)$val->tagihan,
+                    'harga' => $val->harga,
+                    'tunai' => $val->tunai,
+                    'piutang' => $val->piutang,
+                    'tagihan' => $val->tagihan,
                     'kd_dokter' =>$val->kd_dokter,
                     'kd_subunit' =>$val->kd_sub_unit,
                     'akun_rek1' => $val->rek_p,
@@ -68,10 +69,10 @@ class TransformTagihan
                 'no_reg' =>$key,
                 'tanggal_registrasi' => $tgl_reg,
                 'jenis_rawat' => $jenis_rawat,            
-                'total_bayar' => $tunai_tambah - $retur_obat_tunai,
-                'total_piutang' => $piutang_tambah - $piutang_kurang,
-                'total_tagihan' => $tagihan_tambah - $tagihan_kurang + $retur_obat_tunai,
-                'retur_obat' => $retur_obat_tunai,
+                'total_bayar' => (String) ($tunai_tambah - $retur_obat_tunai),
+                'total_piutang' => (String)($piutang_tambah - $piutang_kurang),
+                'total_tagihan' => (String)($tagihan_tambah - $tagihan_kurang + $retur_obat_tunai),
+                'retur_obat' => (String)($retur_obat_tunai),
             ];
             $total_tunai_all += $tunai_tambah - $retur_obat_tunai;
             $total_retur_all += $retur_obat_tunai;
@@ -79,10 +80,10 @@ class TransformTagihan
             $total_tagihan_all += $tagihan_tambah - $tagihan_kurang + $retur_obat_tunai;
         }        
         $output3=[
-            'bayar' => $total_tunai_all,
-            'piutang' => $total_piutang_all,
-            'tagihan' => $total_tagihan_all,
-            'retur_obat' => $total_retur_all
+            'bayar' => (String)$total_tunai_all,
+            'piutang' => (String)$total_piutang_all,
+            'tagihan' => (String)$total_tagihan_all,
+            'retur_obat' => (String)$total_retur_all
         ];
         $data['tagihan_total'] = $output3;  
         $data['tagihan'] = $output;

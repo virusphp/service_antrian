@@ -38,9 +38,9 @@ class TransformTagihanBayar
                     'no_bukti' => $val['no_bukti'],
                     'nama_tarif' => $val['nama_tarif'],
                     'kelompok' => $val['kelompok'],
-                    'harga' => $val['harga'],
-                    'tunai' => $val['tunai'],                
-                    'tagihan' => $val['tagihan'],
+                    'harga' => (String)$val['harga'],
+                    'tunai' => (String)$val['tunai'],                
+                    'tagihan' => (String)$val['tagihan'],
                 ];
                 $bayar = $val['total_bayar'];
             }
@@ -48,7 +48,7 @@ class TransformTagihanBayar
             $no_kw[]=$key;
             
         } 
-        $data['pembayaran']['total_bayar'] = (float)$total_bayar;
+        $data['pembayaran']['total_bayar'] = (String)$total_bayar;
         $data['pembayaran']['no_kwitansi'] = $no_kw;
         $data['rincian_pembayaran']= $output;
         return $data;

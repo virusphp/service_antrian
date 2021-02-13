@@ -60,4 +60,11 @@ class Perubahan
     
         return $result;
     }
+
+    public static function round_up($value, $places) {
+        $mult = 100;
+        return $places < 0 ?
+            ceil($value / $mult) * $mult :
+            ceil($value * $mult) / $mult;
+    }
 }

@@ -80,7 +80,7 @@ class TransformTagihan
             $total_tagihan_all += $tagihan_tambah - $tagihan_kurang + $retur_obat_tunai;
         }        
         $output3=[
-            'bayar' => (String)$total_tunai_all,
+            'bayar' => (String)Perubahan::round_up($total_tunai_all,-2),
             'piutang' => (String)$total_piutang_all,
             'tagihan' => (String)$total_tagihan_all,
             'retur_obat' => (String)$total_retur_all
@@ -149,12 +149,13 @@ class TransformTagihan
                 $jenis_rawat =  Perubahan::jenis_rawat($val->no_reg); 
                 $tgl_reg = Perubahan::tanggalIndo($val->tgl_reg);
             }
-            
+            $total_bayar = $tunai_tambah - $retur_obat_tunai;
             $output[$key] = [    
                 'no_reg' =>$key,
                 'tanggal_registrasi' => $tgl_reg,
                 'jenis_rawat' => $jenis_rawat,            
-                'total_bayar' => $tunai_tambah - $retur_obat_tunai,
+                'total_bayar' => $total_bayar,
+                'total_bayar_bulat' => Perubahan::round_up($total_bayar,-2),
                 'total_tunai' => $tunai_tambah,
                 'total_piutang' => $piutang_tambah - $piutang_kurang,
                 'total_tagihan' => $tagihan_tambah - $tagihan_kurang + $retur_obat_tunai,

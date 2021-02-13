@@ -155,7 +155,7 @@ class Tagihan
                     'potongan' =>'',
                     'grandtotal_tunai' =>$val['total_bayar'],
                     'grandtotal_piutang' =>$val['total_piutang'],
-                    'grandtotal_Tunai_Bulet' =>$val['total_bayar'],
+                    'grandtotal_Tunai_Bulet' =>$val['total_bayar_bulat'],
                     'Iur_Bayar' =>'',
                     'Iur_Bayar_Bulet' =>'',
                     'kd_kasir' =>'00',

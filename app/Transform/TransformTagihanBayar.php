@@ -48,7 +48,7 @@ class TransformTagihanBayar
             $no_kw[]=$key;
             
         } 
-        $data['pembayaran']['total_bayar'] = (String)$total_bayar;
+        $data['pembayaran']['total_bayar'] = (String)Perubahan::round_up($total_bayar,-2);
         $data['pembayaran']['no_kwitansi'] = $no_kw;
         $data['rincian_pembayaran']= $output;
         return $data;

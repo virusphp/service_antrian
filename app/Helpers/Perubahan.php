@@ -32,6 +32,20 @@ class Perubahan
     {
         $hasil = substr($nilai,0,2);
         if($hasil=='01'){
+            return "RJ";
+        }else if($hasil=='02'){
+            return "RI";
+        }else if($hasil=='03'){
+           return "RD";
+        }else{
+            return "LB";
+        }
+    }
+
+    public static function jenis_rawat2($nilai)
+    {
+        $hasil = substr($nilai,0,2);
+        if($hasil=='01'){
             return "Pemeriksaan atau Tindakan Rawat Jalan";
         }else if($hasil=='02'){
             return "Pemeriksaan atau Tindakan Rawat Inap";

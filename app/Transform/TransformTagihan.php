@@ -73,7 +73,7 @@ class TransformTagihan
                     'akun_rek1' => $val->rek_p,
                     'akun_rek2' => $val->rek_p2
                 ];      
-                $jenis_rawat =  Perubahan::jenis_rawat($val->no_reg); 
+                $jenis_rawat =  Perubahan::jenis_rawat2($val->no_reg); 
                 $tgl_reg = Perubahan::tanggalIndo($val->tgl_reg);
             }
             $besar_tagihan = $tunai_tambah - $retur_obat_tunai;         

@@ -18,7 +18,7 @@ class BankJatengController extends Controller
     }
 
     public function bayarTagihan(Request $r, PostTagihanBayar $valid)
-    {
+    {        
         $validate = $valid->rules($r);
 
         if ($validate->fails()) {
@@ -26,7 +26,7 @@ class BankJatengController extends Controller
             return response()->jsonApi('01', implode(",",$message));    
         }
 
-        $bayartagihan = $this->tagihan->bayarTagihan($r);
+        $bayartagihan = $this->tagihan->bayarTagihan($r); 
         if($bayartagihan['status']=='01'){
             $message = [
                 "messageError" => "Data Tagihan Pasien tidak di temukan!"

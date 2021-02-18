@@ -10,7 +10,7 @@ ini_set('max_input_nesting_level',5000);
 class Tagihan
 {
     protected $dbsimrs = "sql_simrs";
-    protected $tahun ="2020";
+    protected $tahun ="2019";
 
     public function __construct()
     {
@@ -77,8 +77,8 @@ class Tagihan
     }
 
     public function bayarTagihan($params)
-    {
-        $setdata = ($params->all());
+    {       
+        $setdata = ($params->all());        
         $getTagihan = $this->getTagihanPasien($setdata);
         if($getTagihan=='01'){
             $response= [
@@ -97,7 +97,7 @@ class Tagihan
                 // 'data' => $this->cariKwitansiByNoreg($noRegPembayar)
             ];
             return $response;
-         }else{                                    
+         }else{                                   
             return $this->InsertKwitansi($setdata,$getTagihan);
          }
     }
@@ -233,7 +233,7 @@ class Tagihan
                 $updateReg[]=[
                     'no_reg_pembayar' =>$val['no_reg']
                 ];
-               DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader); 
+                DB::connection($this->dbsimrs)->table('Kwitansi_Header')->insert($dataKwHeader); 
             }
             $this->deleteTotalTagihanPasien($update);           
             $this->updateTagihanPasien($update);    

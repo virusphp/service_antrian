@@ -32,13 +32,13 @@ class Perubahan
     {
         $hasil = substr($nilai,0,2);
         if($hasil=='01'){
-            return "RJ";
+            return "Pemeriksaan atau Tindakan Rawat Jalan";
         }else if($hasil=='02'){
-            return "RI";
+            return "Pemeriksaan atau Tindakan Rawat Inap";
         }else if($hasil=='03'){
-           return "RD";
+           return "Pemeriksaan atau Tindakan Rawat Darurat";
         }else{
-            return "LB";
+            return "Pemeriksaan Laboratorium";
         }
     }
 

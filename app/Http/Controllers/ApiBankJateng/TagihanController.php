@@ -49,7 +49,8 @@ class TagihanController extends Controller
                     "messageError" => "Data Tagihan Pasien Sudah Dibayar"
                 ];        
                 return response()->jsonApi('02', $message["messageError"]);
-            }            
+            }     
+
             $transform = $this->transform->mapperTagihan($pasien, $tagihan); 
             return response()->jsonApi('00', "Data Tagihan Pasien Ditemukan", $transform);
         }        

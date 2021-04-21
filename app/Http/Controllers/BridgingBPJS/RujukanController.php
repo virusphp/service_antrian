@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BridgingBPJS;
 
 use App\Service\Bpjs\Bridging;
+use Illuminate\Http\Request;
 
 class RujukanController extends BpjsController
 {
@@ -54,5 +55,13 @@ class RujukanController extends BpjsController
         $endpoint = "Rujukan/RS/List/Peserta/" . $noKartu;
         $rujukanListRs = $this->bpjs->getRequest($endpoint);
         return $rujukanListRs;
+    }
+
+    public function DeleteRujukan(Request $request)
+    {
+        $data = json_encode($request->all());
+        $endpoint = "Rujukan/delete";
+        $rujukan = $this->bpjs->deleteRequest($endpoint, $data);
+        return $rujukan;
     }
 }

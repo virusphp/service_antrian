@@ -4,7 +4,7 @@ namespace App\Http\Controllers\BridgingBPJS;
 
 use App\Service\Bpjs\Bridging;
 
-class SepController extends BpjsController
+class RencanaKontrolController extends BpjsController
 {
     protected $bpjs;
 
@@ -14,17 +14,17 @@ class SepController extends BpjsController
         $this->bpjs = new Bridging($this->consid, $this->timestamp, $this->signature);
     }
 
-    public function CariSep($noSep)
+    public function KontrolCariSep($noSep)
     {
-        $endpoint = "SEP/" . $noSep;
+        $endpoint = "RencanaKontrol/nosep/" . $noSep;
         $sep = $this->bpjs->getRequest($endpoint);
         return $sep;
     }
 
-    public function InsertSep($dataJson)
+    public function KontrolCariSurat($noSurat)
     {
-        $endpoint = "SEP/1.1/insert";
-        $sep = $this->bpjs->postRequest($endpoint, $dataJson);
-        return $sep;
+        $endpoint = "RencanaKontrol/noSuratKontrol/" . $noSurat;
+        $noSurat = $this->bpjs->getRequest($endpoint);
+        return $noSurat;
     }
 }

@@ -10,6 +10,12 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
+$router->get('/tanggalnow', function() {
+    return [
+        'tanggal' => date('Y-m-d'),
+        'jam' => date('H:i:s')
+    ];
+});
 
 $router->get('/', function () {
     return view('welcome.api');
@@ -60,6 +66,7 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
     $router->get('/rujukan/rs/peserta/{noKartu}', 'RujukanController@PesertaRs');
     $router->get('/rujukan/list/peserta/{noKartu}', 'RujukanController@PesertaListPcare');
     $router->get('/rujukan/rs/list/peserta/{noKartu}', 'RujukanController@PesertaListRs');
+    $router->post('/rujukan/delete', 'RujukanController@DeleteRujukan');
 
     // --------------------- Monitoring ----------------------------//
     $router->get('/monitoring/kunjungan/tanggal/{tglSep}/jnspelayanan/{jnsPel}', 'MonitoringController@Kunjungan');
@@ -69,6 +76,11 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
 
     // ---------------------- SEP ---------------------------------//
     $router->get('/sep/{noSep}', 'SepController@CariSep');
+
+
+    // ---------------------- SEP ---------------------------------//
+    $router->get('/rencanakontrol/nosep/{noSep}', 'RencanaKontrolController@KontrolCariSep');
+    $router->get('/rencanakontrol/nosuratkontrol/{noSurat}', 'RencanaKontrolController@KontrolCariSurat');
 
 });
 

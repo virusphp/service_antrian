@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+date_default_timezone_set('UTC');
 
 class BPJSHelper
 {

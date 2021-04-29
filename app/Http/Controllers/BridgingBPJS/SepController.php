@@ -24,7 +24,7 @@ class SepController extends BpjsController
 
     public function InsertSep(Request $request)
     {
-        $dataJson = $request->all();
+        $dataJson = json_encode($request->all());
         $endpoint = "SEP/1.1/insert"; 
         $sep = $this->bpjs->postRequest($endpoint, $dataJson);
         return $sep;

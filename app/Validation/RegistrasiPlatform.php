@@ -15,6 +15,10 @@ class RegistrasiPlatform
             'password' => 'required',
             'repassword' => 'required|same:password|min:6',
             'phone' => 'required|min:10',
+        ],[
+            'required' => 'Tidak boleh kosong atau NULL!',
+            'date'     => 'Tidak sesuai tanggal NASIONAl! atau Tidak Valid',
+            'email'       => 'Format Email tidak valid!!',
         ]);
     }
 

@@ -8,17 +8,19 @@ class Kamar
 {
     protected $dbsimrs = "sql_simrs";
 
+    // convert(varchar, getdate(), 120) as tgl_update
+
     public function getListBedKemkes()
     {
         return DB::connection($this->dbsimrs)->table('Tempat_Tidur as tt')
-            ->select('kls.kode_siranap as kode_ruang','su.nama_sub_unit as ruang', 
+            ->select('tt.kd_tt_kemkes as id_tt','su.nama_sub_unit as ruang',
                         DB::raw("
+                                1 as jumlah_ruang,
                                 sum(case when tt.status=1 or tt.status=0 or tt.status=2 then 1 else 0 end) as jumlah,
                                 sum(case when tt.status=1 and kmr.kelamin='l' or tt.status=1 and kmr.kelamin='p' or tt.status=1 and kmr.kelamin='c' then 1 else 0 end) as terpakai,
                                 sum(case when tt.status=0 and kmr.kelamin='l' or tt.status=0 and kmr.kelamin='p' or tt.status=0 and kmr.kelamin='c' then 1 else 0 end) as prepare,
-                                sum(case when tt.status=2 and kmr.kelamin='l' or tt.status=2 and kmr.kelamin='p' or tt.status=2 and kmr.kelamin='c' then 1 else 0 end) as prepare_plan,
-                                convert(varchar, getdate(), 120) as tgl_update
-                        ") )
+                                sum(case when tt.status=2 and kmr.kelamin='l' or tt.status=2 and kmr.kelamin='p' or tt.status=2 and kmr.kelamin='c' then 1 else 0 end) as prepare_plan
+                        "),'tt.status_covid as covid' )
             ->join('Kamar as kmr', function($join){
                 $join->on('tt.kd_kamar','=', 'kmr.kd_kamar')
                     ->join('sub_unit as su', function($join) {
@@ -33,7 +35,8 @@ class Kamar
             ->whereIn('tt.status', [0,1,2,3])
             ->whereNotIn('tt.kd_jenis_kamar', [14])
             ->whereNotNull('tt.kd_jenis_kamar')
-            ->groupBy('kls.kode_siranap', 'su.nama_sub_unit')
+            ->whereNotNull('tt.kd_tt_kemkes')
+            ->groupBy('tt.kd_tt_kemkes','su.nama_sub_unit', 'tt.status_covid')
             ->get();
        
     }

@@ -66,11 +66,10 @@ class Bridging extends Kemkes
     public function deleteRequest($endpoint, $data)
     {
         $data = file_get_contents("php://input");
-        // dd($data, $this->header, $endpoint);
         try {
             $url = $this->kemkes_url . $endpoint;
             $result = $this->client->delete($url, ['headers' => $this->headers, 'body' => $data]);
-            $response = $result->getBody();
+            $response = $result->getBody()->getContents();
             return $response;
         } catch (RequestException $e) {
             $result = Psr7\str($e->getRequest());

@@ -8,6 +8,7 @@ class Bpjs
 {
     protected $client = null;
     protected $bpjs_url;
+    protected $bpjs_url_sku;
     // protected $consid;
     // protected $timestamp;
     // protected $signature;
@@ -19,6 +20,7 @@ class Bpjs
         // $this->timestamp = $timestamp;
         // $this->signature = $signature;
         $this->bpjs_url = config('bpjs.api.endpoint');
+        $this->bpjs_url_sku = config('bpjs.api.endpointsku');
         $this->client = new Client([
             'cookies' => true,
             'verify' => true

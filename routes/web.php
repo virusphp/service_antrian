@@ -11,6 +11,12 @@
 |
 */
 
+use Illuminate\Support\Facades\Hash;
+
+$router->get('/buatpassword/{password}', function($password) {
+    return Hash::make($password);
+});
+
 $router->get('/', function () {
     return view('welcome.api');
 });
@@ -25,11 +31,16 @@ $router->group(['namespace'  => 'ApiSSO'], function() use ($router) {
 $router->group(['namespace'  => 'ApiSIMRS'], function() use ($router) {
     // API  UNTUK ANDROID 
     $router->group(['namespace' => 'Android'], function() use ($router) {
-        $router->post('/registrasi/user/pasien', 'RegistrasiAndroidController@RegistrasiAndroid');
+        $router->post('/registrasi/user/pasien', 'RegistrasiAndroidController@registrasiAndroid');
+        $router->post('/login/user/pasien', 'LoginAndroidController@loginAndroid');
+
+        $router->get('/list/poliklinik', 'TarifPoliklinikController@getListPoli');
+        $router->get('/tarif/poliklinik/{kodePoli}', 'TarifPoliklinikController@getTarifPoli');
     });
     
     // API UNTUK APM ANJUNGAN MANDIRI
     $router->get('/data/registrasi/{noRm}', 'ApmController@dataRegistrasi');
+
     //  TEMPAT TIDUR
     $router->get('/list/tempattidur/kemkes', 'KamarController@getListKamarKemkes');
     $router->get('/list/tempattidur/siranap', 'KamarController@getListKamarSiranap');
@@ -86,11 +97,22 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
     $router->get('/monitoring/jasaraharja/tglawal/{tglAwal}/tglakhir/{tglAkhir}', 'MonitoringController@JasaRaharja');
 
     // ---------------------- SEP ---------------------------------//
+    $router->post('/sep/insert', 'SepController@InsertSep');
     $router->get('/sep/{noSep}', 'SepController@CariSep');
     $router->delete('/sep/delete', 'SepController@DeleteSep');
 
     // ---------------------- SEP ---------------------------------//
     $router->delete('/rujukan/delete', 'RujukanController@DeleteRujukan');
+
+    // ---------------------- SURAT KONTROL ---------------------------------//
+    $router->get('/rencanakontrol/jadwalpraktekdokter/jnskontrol/{jnsKontrol}/kodepoli/{kodePoli}/tglrencanakontrol/{tglKontrol}', 'RencanaKontrolController@DataDokter');
+    $router->get('/rencanakontrol/listspesialistik/jnskontrol/{jnsKontrol}/nomor/{nomor}/tglrencanakontrol/{tglKontrol}', 'RencanaKontrolController@DataPoli');
+    $router->get('/rencanakontrol/listrencanakontrol/tglawal/{tglAwal}/tglakhir/{tglAkhir}/filter/{filter}', 'RencanaKontrolController@DataSuratkontrol');
+    $router->get('/rencanakontrol/nosuratkontrol/{noSurat}', 'RencanaKontrolController@CariSurat');
+    $router->get('/rencanakontrol/nosep/{noSep}', 'RencanaKontrolController@CariSep');
+    $router->post('/rencanakontrol/delete', 'RencanaKontrolController@DeleteSurat');
+    $router->post('/rencanakontrol/update', 'RencanaKontrolController@UpdateSurat');
+    $router->post('/rencanakontrol/insert', 'RencanaKontrolController@InsertSurat');
 
 });
 
@@ -105,6 +127,7 @@ $router->group(['namespace'  => 'ApiKemkes'], function() use ($router) {
     //  Api Tempat tidur
     $router->get('/fasyankes/list/tempattidur', 'BedController@getTempatTidur');
     $router->post('/fasyankes/post/tempattidur', 'BedController@postTempatTidur');
+    $router->delete('/fasyankes/delete/tempattidur', 'BedController@deleteTempatTidur');
 
     // Api Rekap Pasien 
     $router->get('/laporan/list/pasienmasuk', 'RekapPasienController@getPasienMasuk');

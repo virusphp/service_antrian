@@ -20,9 +20,30 @@ class Pasien
     public function dataPasien($params)
     {
         return DB::connection($this->dbsimrs)->table('pasien')
-            ->select('no_rm','nama_pasien','alamat','rt','rw', 'jns_kel','tgl_lahir')
-            ->where([['no_rm', '=', $params->no_rm], ['tgl_lahir', '=', $params->tanggal_lahir]])
+            ->select('no_rm','nik as ktp', 'nama_pasien','alamat','rt','rw', 'jns_kel','tgl_lahir')
+            ->where([['no_rm', '=', $params->no_rm], ['tgl_lahir', '=', $params->tgl_lahir]])
             ->first();
+    }
+
+    public function dataUser($params)
+    {
+        return DB::connection($this->dbsimrs)
+            ->table('user_pasien_online as u')
+            ->select('u.no_rm','u.password', 'u.tgl_lahir')
+            ->join('pasien as p', 'u.no_rm','=','p.no_rm')
+            ->where('u.no_rm', '=', $params->username)
+            ->first();
+    }
+
+    public function insertUserLogin($params)
+    {
+        return DB::connection($this->dbsimrs)->table('user_pasien_online')->insert([
+            'no_rm' => $params->no_rm,
+            'no_ktp' => $params->no_ktp,
+            'tgl_lahir' => $params->tgl_lahir,
+            'email' => $params->email,
+            'password' => app('hash')->make($params->password)
+        ]);
     }
 
     public function getBiodataPasien($noRm)

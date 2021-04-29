@@ -37,4 +37,12 @@ class BedController extends KemkesController
         $tempatTidur = $this->kemkes->putRequest($endpoint, $dataJson);
         return $tempatTidur;
     }
+
+    public function deleteTempatTidur(Request $request)
+    {
+        $dataJson = $request->all();
+        $endpoint = "Fasyankes";
+        $tempatTidur = $this->kemkes->deleteRequest($endpoint, $dataJson);
+        return $tempatTidur;
+    }
 }

@@ -49,7 +49,6 @@ $router->group(['namespace'  => 'ApiSIMRS'], function() use ($router) {
     $router->get('/pasien/biodata/norm/{noRm}', 'PasienController@getBiodataPasien');
 });
 
-
 // ------------------- REGISTRASI POLIKLINIK MULTI PLATFORM
 $router->group(['namespace' => 'ApiSIMRS', 'middleware' => 'bpjs'], function() use ($router) {    
     $router->post('/antrian/registrasi/via/bpjs', 'AntrianController@Register');

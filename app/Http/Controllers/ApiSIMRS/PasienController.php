@@ -50,7 +50,7 @@ class PasienController extends BpjsController
         $peserta->jenis_peserta = $peserta->response->peserta->jenisPeserta->keterangan;
         $peserta->nik = $peserta->response->peserta->nik;
         unset($peserta->metaData, $peserta->response);
-        return$peserta;
+        return $peserta;
     }
 
 }

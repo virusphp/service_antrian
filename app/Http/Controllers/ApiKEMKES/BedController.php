@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\ApiKemkes;
+namespace App\Http\Controllers\ApiKEMKES;
 
 use App\Service\Kemkes\Bridging;
 use Illuminate\Http\Request;

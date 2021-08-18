@@ -20,7 +20,7 @@ class Bridging extends Bpjs
     public function getRequest($endpoint)
     {
         try {
-            $url = $this->bpjs_url_sku . $endpoint;
+            $url = $this->bpjs_url . $endpoint;
             $response = $this->client->get($url, ['headers' => $this->header]);
             $result = $response->getBody()->getContents();
             return $result;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\ApiKemkes;
+namespace App\Http\Controllers\ApiKEMKES;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\KemkesHelper;

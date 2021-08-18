@@ -41,12 +41,17 @@ $router->group(['namespace'  => 'ApiSIMRS'], function() use ($router) {
     // API UNTUK APM ANJUNGAN MANDIRI
     $router->get('/data/registrasi/{noRm}', 'ApmController@dataRegistrasi');
 
+
     //  TEMPAT TIDUR
     $router->get('/list/tempattidur/kemkes', 'KamarController@getListKamarKemkes');
     $router->get('/list/tempattidur/siranap', 'KamarController@getListKamarSiranap');
     $router->get('/list/tempattidur/siranap/xml', 'KamarController@getListKamarSiranapXml');
 
     $router->get('/pasien/biodata/norm/{noRm}', 'PasienController@getBiodataPasien');
+
+    // DOKUMEN PASIEN
+    $router->post('/pasien/dokumen/simpan', 'DokumenPasienController@simpanDokumen');
+    $router->post('/pasien/dokumen/update', 'DokumenPasienController@updateDokumen');
 });
 
 // ------------------- REGISTRASI POLIKLINIK MULTI PLATFORM
@@ -112,6 +117,7 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
     $router->post('/rencanakontrol/delete', 'RencanaKontrolController@DeleteSurat');
     $router->post('/rencanakontrol/update', 'RencanaKontrolController@UpdateSurat');
     $router->post('/rencanakontrol/insert', 'RencanaKontrolController@InsertSurat');
+
 
 });
 

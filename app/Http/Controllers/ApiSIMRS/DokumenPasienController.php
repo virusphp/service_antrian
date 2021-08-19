@@ -82,7 +82,6 @@ class DokumenPasienController extends Controller
         $data = $request->all();
         if (!isset($data['id_file'])) {
             $data['id_file'] = $this->handleId();
-            dd($data['id_file']);
         } 
         $data['id_file'] = $data['id_file'];
 

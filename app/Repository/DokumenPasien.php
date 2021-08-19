@@ -36,10 +36,10 @@ class DokumenPasien
                                 'id_file' => $params['id_file'],
                                 'no_rm' => $params['no_rm'],
                                 'no_reg' => $params['no_reg'],
-                                'kd_jenis_file' => $params['kd_jenis_file'],
+                                'kd_jenis_file' => $params['kode_jenis_file'],
                                 'file_pasien' => $params['file_pasien'],
                                 'tgl_created' => Carbon::now(),
-                                'user_created' => $params['kd_pegawai']
+                                'user_created' => $params['kode_pegawai']
 
                             ]);
             if ($dokumenPasien) {

@@ -31,7 +31,6 @@ class DokumenPasienController extends Controller
         }
         $data = $this->handleFile($r);
         $respon = $this->dokumenPasien->simpan($data);
-        // dd($respon);
 
         if (!$respon) {
             return response()->jsonApi(201, "Terjadi kesalahan data input masih salah");
@@ -64,9 +63,18 @@ class DokumenPasienController extends Controller
         }
 
         if ($oldFile !== $respon->file_pasien) {
-            
+           $this->deleteImage($data['no_rm'], $oldFile); 
         }
 
+        $transform = new DokumenResource($respon);
+
+         return response()->jsonApi(200, "OK", $transform);
+    }
+
+    protected function deleteImage($noRm, $oldFile)
+    {
+        $path = storage_path() . DIRECTORY_SEPARATOR . $this->getDestination($noRm) . $oldFile;
+        return File::delete($path);
     }
 
     protected function handleFile($request)
@@ -78,7 +86,6 @@ class DokumenPasienController extends Controller
         } 
         $data['id_file'] = $data['id_file'];
 
-        dd($data);
 
         if ($request->hasFile('file_pasien')) {
             $file =  $request->file('file_pasien');

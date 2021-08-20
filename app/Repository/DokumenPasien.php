@@ -19,12 +19,12 @@ class DokumenPasien
                 ->max('id_file');
     }
 
-    public function checkData($params)
+    public function checkData($idFile)
     {
         // dd($params['id_file']);
         return DB::connection($this->dbsimrs)
                     ->table('pasien_file')
-                    ->where('id_file', $params['id_file'])
+                    ->where('id_file', $idFile)
                     ->first();
     }
 

@@ -50,7 +50,7 @@ class DokumenPasienController extends Controller
             return response()->jsonApi(422, implode(",",$message));    
         }
 
-        $checkData = $this->dokumenPasien->checkData($r);
+        $checkData = $this->dokumenPasien->checkData($r->id_file);
 
         $oldFile = $checkData->file_pasien;
 
@@ -69,6 +69,18 @@ class DokumenPasienController extends Controller
         $transform = new DokumenResource($respon);
 
          return response()->jsonApi(200, "OK", $transform);
+    }
+
+    public function showDokumen($idFile)
+    {
+        $checkData = $this->dokumenPasien->checkData($idFile);
+        if (!$checkData) {
+            return response()->jsonApi(201, "Data tidak di temukan!!");
+        }
+
+        $transform = new DokumenResource($checkData);
+        
+        return response()->jsonApi(200, "OK", $transform);
     }
 
     protected function deleteImage($noRm, $oldFile)

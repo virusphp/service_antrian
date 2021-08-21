@@ -27,18 +27,18 @@ class DokumenPasienController extends Controller
 
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonApi(422, implode(",",$message));    
+            return response()->jsonSimrs(422, implode(",",$message));    
         }
         $data = $this->handleFile($r);
         $respon = $this->dokumenPasien->simpan($data);
 
         if (!$respon) {
-            return response()->jsonApi(201, "Terjadi kesalahan data input masih salah");
+            return response()->jsonSimrs(201, "Terjadi kesalahan data input masih salah");
         }
 
         $transform = new DokumenResource($respon);
 
-        return response()->jsonApi(200, "OK", $transform);
+        return response()->jsonSimrs(200, "OK", $transform);
     }
 
     public function updateDokumen(Request $r, UpdateDokumenPasien $valid)
@@ -47,7 +47,7 @@ class DokumenPasienController extends Controller
 
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonApi(422, implode(",",$message));    
+            return response()->jsonSimrs(422, implode(",",$message));    
         }
 
         $checkData = $this->dokumenPasien->checkData($r->id_file);
@@ -59,7 +59,7 @@ class DokumenPasienController extends Controller
         $respon = $this->dokumenPasien->update($data);
 
         if (!$respon) {
-            return response()->jsonApi(201, "Terjadi kesalahan data input masih salah");
+            return response()->jsonSimrs(201, "Terjadi kesalahan data input masih salah");
         }
 
         if ($oldFile !== $respon->file_pasien) {
@@ -68,19 +68,19 @@ class DokumenPasienController extends Controller
 
         $transform = new DokumenResource($respon);
 
-         return response()->jsonApi(200, "OK", $transform);
+         return response()->jsonSimrs(200, "OK", $transform);
     }
 
     public function showDokumen($idFile)
     {
         $checkData = $this->dokumenPasien->checkData($idFile);
         if (!$checkData) {
-            return response()->jsonApi(201, "Data tidak di temukan!!");
+            return response()->jsonSimrs(201, "Data tidak di temukan!!");
         }
 
         $transform = new DokumenResource($checkData);
         
-        return response()->jsonApi(200, "OK", $transform);
+        return response()->jsonSimrs(200, "OK", $transform);
     }
 
     protected function deleteImage($noRm, $oldFile)

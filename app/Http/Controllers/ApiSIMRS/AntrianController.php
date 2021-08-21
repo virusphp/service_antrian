@@ -21,7 +21,6 @@ class AntrianController extends Controller
 
     public function Register(Request $r, PostAntrian $valid)
     {
-
         $validate = $valid->rules($r);
 
         if ($validate->fails()) {

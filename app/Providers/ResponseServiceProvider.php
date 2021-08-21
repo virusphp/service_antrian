@@ -30,6 +30,20 @@ class ResponseServiceProvider extends ServiceProvider
 
             return $factory->make($format);
         });
+        
+        
+        $factory->macro('jsonSimrs', function($code = 200, $message = '', $data = null) use ($factory) {
+            $format = [
+                'metaData' => [
+                    'kode' => $code,
+                    'pesan' => $message
+                ],
+                'response' => $data
+            ];
+
+            return $factory->make($format);
+        });
+
 
         $factory->macro('jsonApiBpjs', function($code = 200, $message = '', $data = null) use ($factory) {
             $format = [

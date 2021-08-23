@@ -9,18 +9,19 @@ use App\Validation\DokumenPasien;
 use App\Validation\UpdateDokumenPasien;
 use Illuminate\Http\Request;
 use File;
-use Illuminate\Support\Facades\Storage;;
 
 class DokumenPasienController extends Controller
 {
     protected $dokumenPasien;
-    protected $transform;
 
     public function __construct()
     {
        $this->dokumenPasien = new AppDokumenPasien;
     }
 
+    /**
+     * Simpan Dokumen
+     */
     public function simpanDokumen(Request $r, DokumenPasien $valid)
     {
         $validate = $valid->rules($r);
@@ -41,6 +42,9 @@ class DokumenPasienController extends Controller
         return response()->jsonSimrs(200, "OK", $transform);
     }
 
+    /**
+     * Update Dokumen
+     */
     public function updateDokumen(Request $r, UpdateDokumenPasien $valid)
     {
         $validate = $valid->rules($r);
@@ -71,6 +75,9 @@ class DokumenPasienController extends Controller
          return response()->jsonSimrs(200, "OK", $transform);
     }
 
+    /**
+     * Show Dokumen
+     */
     public function showDokumen($idFile)
     {
         $checkData = $this->dokumenPasien->checkData($idFile);
@@ -80,9 +87,33 @@ class DokumenPasienController extends Controller
 
         $transform = new DokumenResource($checkData);
         
-        return response()->jsonSimrs(200, "OK", $transform);
+        return response()->jsonApi(200, "OK", $transform);
     }
 
+    /**
+     * Delete Dokumen
+     */
+    public function deleteDokumen(Request $r)
+    {
+        $checkData = $this->dokumenPasien->checkData($r->id_file);
+  
+        if (!$checkData) {
+            return response()->jsonSimrs(201, "Data tidak di temukan!!");
+        }
+
+        $dokumenPasien = $this->dokumenPasien->deleteDokumen($r->id_file);
+
+        if (!$dokumenPasien) {
+            return response()->jsonSimrs(201, "Data tidak di temukan!!");
+        }
+
+        return response()->jsonApi(200, "Data $r->id_file berhasil di hapus!");
+
+    }
+
+    /**
+     * Delete Image
+     */
     protected function deleteImage($noRm, $oldFile)
     {
         $path = storage_path() . DIRECTORY_SEPARATOR . $this->getDestination($noRm) . $oldFile;

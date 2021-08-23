@@ -76,4 +76,11 @@ class DokumenPasien
             return $e->getMessage();
         }           
     }
+
+    public function deleteDokumen($idFile)
+    {
+        return DB::connection($this->dbsimrs)->table('pasien_file')
+                    ->where('id_file', $idFile)
+                    ->delete();
+    }
 }

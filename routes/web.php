@@ -52,6 +52,7 @@ $router->group(['namespace'  => 'ApiSIMRS'], function() use ($router) {
     // DOKUMEN PASIEN
     $router->post('/pasien/dokumen/simpan', 'DokumenPasienController@simpanDokumen');
     $router->post('/pasien/dokumen/update', 'DokumenPasienController@updateDokumen');
+    $router->post('/pasien/dokumen/delete', 'DokumenPasienController@deleteDokumen');
     $router->get('/pasien/dokumen/show/{idFile}', 'DokumenPasienController@showDokumen');
 });
 

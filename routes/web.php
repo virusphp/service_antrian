@@ -56,7 +56,7 @@ $router->group(['namespace'  => 'ApiSIMRS'], function() use ($router) {
     $router->get('/pasien/dokumen/show/{idFile}', 'DokumenPasienController@showDokumen');
 });
 
-// ------------------- REGISTRASI POLIKLINIK MULTI PLATFORM
+// ------------------- REGISTRASI POLIKLINIK MULTI PLATFORM BRIDGING MOBILE JKN
 $router->group(['namespace' => 'ApiSIMRS', 'middleware' => 'bpjs'], function() use ($router) {    
     $router->post('/antrian/registrasi/via/bpjs', 'AntrianController@Register');
     $router->post('/antrian/getrekap', 'AntrianController@getRekapAntrian');

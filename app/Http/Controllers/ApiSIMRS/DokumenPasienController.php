@@ -87,7 +87,7 @@ class DokumenPasienController extends Controller
 
         $transform = new DokumenResource($checkData);
         
-        return response()->jsonApi(200, "OK", $transform);
+        return response()->jsonSimrs(200, "OK", $transform);
     }
 
     /**
@@ -107,7 +107,7 @@ class DokumenPasienController extends Controller
             return response()->jsonSimrs(201, "Data tidak di temukan!!");
         }
 
-        return response()->jsonApi(200, "Data $r->id_file berhasil di hapus!");
+        return response()->jsonSimrs(200, "Data $r->id_file berhasil di hapus!");
 
     }
 

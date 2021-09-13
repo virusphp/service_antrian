@@ -24,7 +24,11 @@ $router->get('/', function () {
 // ----------------- REGISTRASI ACCESS SSO MULTI APP BY SCOPE
 $router->group(['namespace'  => 'ApiSSO'], function() use ($router) {
     $router->post('/access/register', 'RegistrasiPlatrofmController@Register');
-    $router->post('/access/login', 'LoginPlatformController@Login');
+    $router->post('access/login', 'LoginPlatformController@Login');
+
+    $router->group(['middleware' => 'ssobpjs', 'prefix' => 'bpjs'], function() use ($router) {
+        $router->post('access/login', 'LoginPlatformController@Login');
+    });
 });
 
 // -------------------------- API SIMRS
@@ -38,10 +42,6 @@ $router->group(['namespace'  => 'ApiSIMRS'], function() use ($router) {
         $router->get('/tarif/poliklinik/{kodePoli}', 'TarifPoliklinikController@getTarifPoli');
     });
     
-    // API UNTUK APM ANJUNGAN MANDIRI
-    $router->get('/data/registrasi/{noRm}', 'ApmController@dataRegistrasi');
-
-
     //  TEMPAT TIDUR
     $router->get('/list/tempattidur/kemkes', 'KamarController@getListKamarKemkes');
     $router->get('/list/tempattidur/siranap', 'KamarController@getListKamarSiranap');
@@ -54,6 +54,12 @@ $router->group(['namespace'  => 'ApiSIMRS'], function() use ($router) {
     $router->post('/pasien/dokumen/update', 'DokumenPasienController@updateDokumen');
     $router->post('/pasien/dokumen/delete', 'DokumenPasienController@deleteDokumen');
     $router->get('/pasien/dokumen/show/{idFile}', 'DokumenPasienController@showDokumen');
+
+    // API UNTUK APM ANJUNGAN MANDIRI
+    $router->group(['namespace' => 'Apm', 'prefix' => 'apm'], function() use ($router) {
+        $router->get('/data/registrasi/{noRm}', 'ApmController@dataRegistrasi');
+        $router->post('/rujukaninternal', 'RujukanInternalController@getRujukanInternal');
+    });
 });
 
 // ------------------- REGISTRASI POLIKLINIK MULTI PLATFORM BRIDGING MOBILE JKN
@@ -64,7 +70,7 @@ $router->group(['namespace' => 'ApiSIMRS', 'middleware' => 'bpjs'], function() u
     $router->post('/operasi/getjadwal', 'OperationController@getJadwal');
 });
 
-// ----------------------- API BPJS FROM INTERNAL
+// ----------------------- API BPJS FOR INTERNAL
 $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
     // ----------------- REFERENSI --------------------------//
     $router->get('/referensi/diagnosa/{kode}', 'ReferensiController@diagnosa');
@@ -107,7 +113,7 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
     $router->get('/sep/{noSep}', 'SepController@CariSep');
     $router->delete('/sep/delete', 'SepController@DeleteSep');
 
-    // ---------------------- SEP ---------------------------------//
+    // ---------------------- Rujukan ---------------------------------//
     $router->delete('/rujukan/delete', 'RujukanController@DeleteRujukan');
 
     // ---------------------- SURAT KONTROL ---------------------------------//
@@ -120,6 +126,7 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
     $router->post('/rencanakontrol/update', 'RencanaKontrolController@UpdateSurat');
     $router->post('/rencanakontrol/insert', 'RencanaKontrolController@InsertSurat');
 
+    
 
 });
 
@@ -160,6 +167,9 @@ $router->group(['namespace'  => 'ApiKemkes'], function() use ($router) {
      $router->post('/post/apd', 'ApdController@postAPD');
      $router->put('/put/apd', 'ApdController@updateAPD');
      $router->delete('/delete/apd', 'ApdController@deleteAPD');
+
+    // GANTI PASSWORD SIRS
+    $router->post('/profil/ganti/password', 'ProfilController@updatePassword');
 });
 
 

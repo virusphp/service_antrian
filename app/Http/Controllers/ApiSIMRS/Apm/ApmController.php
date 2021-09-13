@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\ApiSIMRS;
+namespace App\Http\Controllers\ApiSIMRS\Apm;
 
 use App\Http\Controllers\Controller;
 use App\Repository\Antrian;

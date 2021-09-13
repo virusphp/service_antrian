@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ApiSIMRS;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DokumenResource;
 use App\Repository\DokumenPasien as AppDokumenPasien;
+use App\Service\Simrs\ServiceDokumenPasien;
 use App\Validation\DokumenPasien;
 use App\Validation\UpdateDokumenPasien;
 use Illuminate\Http\Request;
@@ -13,10 +14,12 @@ use File;
 class DokumenPasienController extends Controller
 {
     protected $dokumenPasien;
+    protected $serviceDokumenPasien;
 
     public function __construct()
     {
        $this->dokumenPasien = new AppDokumenPasien;
+       $this->serviceDokumenPasien = new ServiceDokumenPasien;
     }
 
     /**
@@ -30,7 +33,8 @@ class DokumenPasienController extends Controller
             $message = $valid->messages($validate->errors());
             return response()->jsonSimrs(422, implode(",",$message));    
         }
-        $data = $this->handleFile($r);
+        $data = $this->serviceDokumenPasien->handleFile($r);
+
         $respon = $this->dokumenPasien->simpan($data);
 
         if (!$respon) {
@@ -45,7 +49,7 @@ class DokumenPasienController extends Controller
     /**
      * Update Dokumen
      */
-    public function updateDokumen(Request $r, UpdateDokumenPasien $valid)
+    public function updateDokumen(Request $r, UpdateDokumenPasien $valid, ServiceDokumenPasien $serviceDokumenPasien)
     {
         $validate = $valid->rules($r);
 
@@ -58,7 +62,7 @@ class DokumenPasienController extends Controller
 
         $oldFile = $checkData->file_pasien;
 
-        $data = $this->handleFile($r);
+        $data = $this->serviceDokumenPasien->handleFile($r);
 
         $respon = $this->dokumenPasien->update($data);
 
@@ -72,7 +76,7 @@ class DokumenPasienController extends Controller
 
         $transform = new DokumenResource($respon);
 
-         return response()->jsonSimrs(200, "OK", $transform);
+        return response()->jsonSimrs(200, "OK", $transform);
     }
 
     /**
@@ -100,7 +104,9 @@ class DokumenPasienController extends Controller
         if (!$checkData) {
             return response()->jsonSimrs(201, "Data tidak di temukan!!");
         }
+        dd($checkData);
 
+        $this->deleteImage($checkData->no_rm, $checkData->file_pasien); 
         $dokumenPasien = $this->dokumenPasien->deleteDokumen($r->id_file);
 
         if (!$dokumenPasien) {
@@ -114,62 +120,62 @@ class DokumenPasienController extends Controller
     /**
      * Delete Image
      */
-    protected function deleteImage($noRm, $oldFile)
+    protected function deleteImage($noRm, $filePasien)
     {
-        $path = storage_path() . DIRECTORY_SEPARATOR . $this->getDestination($noRm) . $oldFile;
+        $path = storage_path() . DIRECTORY_SEPARATOR . $this->serviceDokumenPasien->handleDestination($noRm) . $filePasien;
         return File::delete($path);
     }
 
-    protected function handleFile($request)
-    {
-        $data = $request->all();
-        if (!isset($data['id_file'])) {
-            $data['id_file'] = $this->handleId();
-        } 
-        $data['id_file'] = $data['id_file'];
+    // protected function handleFile($request)
+    // {
+    //     $data = $request->all();
+    //     if (!isset($data['id_file'])) {
+    //         $data['id_file'] = $this->handleId();
+    //     } 
+    //     $data['id_file'] = $data['id_file'];
 
 
-        if ($request->hasFile('file_pasien')) {
-            $file =  $request->file('file_pasien');
-            $extensi = $file->getClientOriginalExtension();
-            $formatName = $data['no_rm'] .'_'. $data['id_file'] . '.' . $extensi;
-            $pathFile = $this->getDestination($data['no_rm']);
+    //     if ($request->hasFile('file_pasien')) {
+    //         $file =  $request->file('file_pasien');
+    //         $extensi = $file->getClientOriginalExtension();
+    //         $formatName = $data['no_rm'] .'_'. $data['id_file'] . '.' . $extensi;
+    //         $pathFile = $this->getDestination($data['no_rm']);
 
-            $urlPath = $data['no_rm'] .'/' . $formatName;
-            $file->storeAs($pathFile, $formatName);
+    //         $urlPath = $data['no_rm'] .'/' . $formatName;
+    //         $file->storeAs($pathFile, $formatName);
             
 
-            $data['file_pasien'] = $formatName;
-            $data['full_path'] = $urlPath;
-        }
+    //         $data['file_pasien'] = $formatName;
+    //         $data['full_path'] = $urlPath;
+    //     }
 
-        return $data;
-    }
+    //     return $data;
+    // }
 
-    private function getDestination($noRm)
-    {
-        return 'public'. DIRECTORY_SEPARATOR. 'pasien'. DIRECTORY_SEPARATOR .$noRm . DIRECTORY_SEPARATOR;
-    }
+    // private function getDestination($noRm)
+    // {
+    //     return 'public'. DIRECTORY_SEPARATOR. 'pasien'. DIRECTORY_SEPARATOR .$noRm . DIRECTORY_SEPARATOR;
+    // }
 
 
-    private function handleId()
-    {
-        $dok = new AppDokumenPasien;
-        $prefix = "FILE";
-        $maxNumber = trim($dok->getMaxNumber($prefix));
+    // private function handleId()
+    // {
+    //     $dok = new AppDokumenPasien;
+    //     $prefix = "FILE";
+    //     $maxNumber = trim($dok->getMaxNumber($prefix));
 
-        if (!$maxNumber) {
+    //     if (!$maxNumber) {
             
-            $start = 1;
-            $noUrut = $prefix . date('ymd') . sprintf("%03s", $start);
+    //         $start = 1;
+    //         $noUrut = $prefix . date('ymd') . sprintf("%03s", $start);
 
-            return $noUrut;
-        }
+    //         return $noUrut;
+    //     }
 
-        $noUrut = (int) substr($maxNumber, -3);
-        $noUrut++;
-        $newNoUrut = $prefix. date('ymd'). sprintf("%03s", $noUrut);
-        return $newNoUrut;
-    }
+    //     $noUrut = (int) substr($maxNumber, -3);
+    //     $noUrut++;
+    //     $newNoUrut = $prefix. date('ymd'). sprintf("%03s", $noUrut);
+    //     return $newNoUrut;
+    // }
 
 }

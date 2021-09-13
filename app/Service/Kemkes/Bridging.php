@@ -38,7 +38,8 @@ class Bridging extends Kemkes
         $data = file_get_contents("php://input");
         try {
             $url = $this->kemkes_url . $endpoint;
-            $result = $this->client->post($url, ['headers' => $this->headers, 'body' => $data]);
+            $response = $this->client->post($url, ['headers' => $this->headers, 'body' => $data]);
+            $result = $response->getBody();
             return $result;
         } catch (RequestException $e) {
             $result = Psr7\str($e->getRequest());
@@ -46,6 +47,23 @@ class Bridging extends Kemkes
                 $result = Psr7\str($e->getResponse());
             }
         } 
+    }
+
+    public function postReqeustPassword($endpoint, $data)
+    {
+        $data = file_get_contents("php://input");
+        try {
+            $url = $this->kemkes_url . $endpoint;
+            $response = $this->client->post($url, ['headers' => $this->header, 'body' => $data]);
+            $result = $response->getBody()->getContents();
+            return $result;
+        } catch (RequestException $e) {
+            $result = Psr7\str($e->getRequest());
+            if ($e->hasResponse()) {
+                $result = Psr7\str($e->getResponse());
+            }
+        } 
+
     }
 
     public function putRequest($endpoint, $data)

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Helpers;
+
+use LZCompressor\LZString;
 date_default_timezone_set('UTC');
 
 class BPJSHelper
@@ -20,8 +22,44 @@ class BPJSHelper
     }
 
     public static function enkripsi($passid)
-    {
+    { 
         return MD5($passid);
+    }
+    
+    public static function keyString($conid, $secid)
+    {
+        $timestamp = strval(time()-strtotime('1970-01-01 00:00:00'));
+        return $conid.$secid.$timestamp;
+    }
+
+    public static function stringDecrypt($key, $string)
+    {
+        $encrtyp_method = 'AES-256-CBC';
+
+        $key_hash = hex2bin(hash('sha256', $key));
+
+        $iv = substr(hex2bin(hash('sha256', $key)), 0, 16);
+
+        $output = openssl_decrypt(base64_decode($string), $encrtyp_method, $key_hash, OPENSSL_RAW_DATA, $iv);
+
+        return $output;
+    }
+
+    public static function stringEncrtypt($key, $string)
+    {
+        $encrtyp_method = 'AES-256-CBC';
+
+        $iv = substr($key, 0, 16);
+
+        $output = base64_encode(openssl_encrypt($string, $encrtyp_method, $key, OPENSSL_RAW_DATA, $iv));
+
+        return $output;
+       
+    }
+
+    public static function decompress($string)
+    {
+        return LZString::decompressFromEncodedURIComponent($string);
     }
 
 }

@@ -19,6 +19,8 @@ class RegistrasiPlatform
             'required' => 'Tidak boleh kosong atau NULL!',
             'date'     => 'Tidak sesuai tanggal NASIONAl! atau Tidak Valid',
             'email'       => 'Format Email tidak valid!!',
+            'username.unique' => 'Username sudah di pakai!!',
+            'email.unique' => 'Email sudah di pakai!!'
         ]);
     }
 

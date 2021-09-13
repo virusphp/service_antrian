@@ -18,7 +18,11 @@ class PesertaController extends BpjsController
     {
         $endpoint = 'Peserta/nokartu/'. $noKartu . "/tglSEP/" . $tglSep;
         $peserta = $this->bpjs->getRequest($endpoint);
-        return $peserta;
+        $result = json_decode($peserta);
+        if ($result->metaData->code == "200" && !isset($result->respnose->peserta)) {
+            return $this->responseBpjs($result);
+        }
+        return json_encode($result);
     }
 
     public function noKtp($nik, $tglSep)

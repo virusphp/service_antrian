@@ -2,30 +2,22 @@
 
 namespace App\Http\Controllers\BridgingBPJS;
 
-use App\Helpers\BPJSHelper;
 use App\Service\Bpjs\Bridging;
 
-class ReferensiController extends BpjsController
+class ReferensiController
 {
-    protected $bpjs;
+    protected $briding;
 
     public function __construct()
     {
-        parent::__construct();
-        $this->bpjs = new Bridging($this->consid, $this->timestamp, $this->signature);
+        $this->bridging = new Bridging();
     }
 
     public function diagnosa($kode)
     {
         $endpoint = "referensi/diagnosa/". $kode;
-        $diagnosa = $this->bpjs->getRequest($endpoint);
-        // return $diagnosa;
-        $result = json_decode($diagnosa);
-        if ($result->metaData->code == "200" && !isset($result->response->diagnosa)) {
-            return $this->responseBpjs($result);
-        }
-        return json_encode($result);
-
+        $diagnosa = $this->bridging->getRequest($endpoint);
+        return $diagnosa;
     }
 
     public function poli($kode)

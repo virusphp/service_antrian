@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Transform\TransformAntrian;
 use Illuminate\Http\Request;
 use App\Repository\Antrian;
-use App\Validation\PostAntrian;
+use App\Repository\AntrianV2;
+use App\Validation\PostAntrianV2;
 use App\Validation\PostRekap;
 
 class AntrianController extends Controller
@@ -15,8 +16,28 @@ class AntrianController extends Controller
 
     public function __construct()
     {
-        $this->antrian = new Antrian;
+        $this->antrian = new AntrianV2;
         $this->transform = new TransformAntrian;
+    }
+
+    public function RegisterV2(Request $r, PostAntrianV2 $valid)
+    {
+        $validate = $valid->rules($r);
+
+        if ($validate->fails()) {
+            $message = $valid->messages($validate->errors());
+            return response()->jsonApiBpjs(422, implode(",",$message));    
+        }
+
+        $result = $this->antrian->postAntrian($r);
+        
+        if ($result['code'] == 200) {
+            unset($result['code']);
+            return response()->jsonApiBpjs(200, "OK", $result);
+        }
+
+        unset($result['code']);
+        return response()->jsonApiBpjs(201, $result['messageError']);
     }
 
     public function Register(Request $r, PostAntrian $valid)
@@ -36,7 +57,6 @@ class AntrianController extends Controller
             return response()->jsonApiBpjs(200, "OK", $result);
         }
 
-        // dd($result);
         unset($result['code']);
         return response()->jsonApiBpjs(201, $result['messageError']);
     }

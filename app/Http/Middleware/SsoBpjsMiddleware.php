@@ -3,6 +3,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\Repository\Access;
+use Illuminate\Support\Facades\Hash;
 
 class SsoBpjsMiddleware
 {
@@ -34,16 +35,24 @@ class SsoBpjsMiddleware
             return response()->json('{"method":"OPTIONS"}', 200, $headers);
         }
 
-        if(!$request->hasHeader('x-username')) {
-            return response()->jsonApiBpjs(401, "Unautorized", ['messageError' => 'Need Token to Access this URL!']);
+        if(!$request->hasHeader('x-username') && !$request->hashHeader('x-password')) {
+            return response()->jsonApiBpjs(401, "Unautorized", ['messageError' => 'Username atau password salah!']);
         }
         // BELUM DI TERUSKAN
-        $username = $request->header('x-username');
-        $accessPlatform = $this->access->checkAccessApi($username);
+        $param['username'] = $request->header('x-username');
+        $param['password'] = $request->header('x-password');
+        $accessPlatform = $this->access->checkAccess($param);
+
         if (!$accessPlatform) {
             return response()->jsonApiBpjs(402, "Not Matching", "Token tidak sesuai");
         }
-        // dd($accessPlatform);
+        if (!Hash::check($param['password'], $accessPlatform->password)) {
+            $message = [
+                "messageError" => "Password tidak cocok silahkan ulangi!"
+            ];
+            return response()->jsonApi(403, $message["messageError"]);
+        } 
+
         $response = $next($request);
 
 

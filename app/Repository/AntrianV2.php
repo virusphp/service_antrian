@@ -11,7 +11,7 @@ use DB;
 use Carbon\Carbon;
 use Exception;
 
-class Antrian
+class AntrianV2
 {
     protected $dbsimrs = "sql_simrs";
 
@@ -168,12 +168,21 @@ class Antrian
             $res['messageError'] = "Pasien tersebut belom terdaftar di rumah sakit kami!";
             return $res;
         }
-
+      
         $dokterPoli = $this->getDokterPoli($params->kodepoli, $params->tanggalperiksa);
-
         if ($dokterPoli == null) {
             $res['code']  = 201;
             $res['messageError'] = "Poli yang di pilih tidak tersedia atau tidak valid!!!";
+            return $res;
+        }
+
+        // CHECK KUOTA
+        $checkQuota = $this->checkQuota($params->tanggalperiksa, $dokterPoli->kd_sub_unit);
+        $dataRegistrasiJkn = $this->checkRegistrasiJkn($params->tanggalperiksa, $dokterPoli->kd_sub_unit); // Online
+
+        if ($dataRegistrasiJkn >= $checkQuota->kuota_jkn) {
+            $res['code'] = 201;
+            $res['messageError'] = "Kuota Registrasi Via JKN sudah penuh!";
             return $res;
         }
 
@@ -184,7 +193,7 @@ class Antrian
             $res['messageError'] = "PENDAFTARAN BPJS SEKALI DALAM SEHARI...!!";
             return $res;
         }
-        // // Poli eksekutif
+        // // Poli eksekutif v2 tidak ada
         // if ($params->polieksekutif == 1) {
         //     $res['code']  = 201;
         //     $res['messageError'] = "Pendaftaran poli eksekutif hanya dapat di lakukan langsung ke RS!!";
@@ -199,8 +208,8 @@ class Antrian
         $statusPengunjung  = $this->getStatusPengunjung($dataPasien->no_rm);
         $asalPasien        = $this->asalPasien($params->jenisreferensi, $params->nomorreferensi);
         $kodePenjamin      = $this->getKodePenjamin($params->nomorkartu, $params->tanggalperiksa);
-        // dd($dataPasien, $tarif, $noBukti, $estimasidilayani, $noReg, $statusPengunjung, $asalPasien, $kodePenjamin);
-
+        // dd($tarif, $noBukti, $estimasidilayani, $noReg, $statusPengunjung, $asalPasien, $kodePenjamin);
+        
         DB::beginTransaction();
         try{
             $saveRegister = DB::connection($this->dbsimrs)->table('registrasi')->insert([
@@ -226,16 +235,25 @@ class Antrian
                 $this->saveRajal($noReg, $dokterPoli, $statusPengunjung, $dataPasien);
                 $this->saveTagihan($noBukti, $dokterPoli, $tarif, $noReg, $params, $dataPasien, $kodePenjamin);
                 $this->saveRujukan($noReg, $dataPasien->no_rm, $params);
-                $this->putTelepon($dataPasien->no_rm, $params->notelp, $params->nik);
+                $this->putTelepon($dataPasien->no_rm, $params->nohp, $params->nik);
                 $nomorAntrian  = $this->getAntrian($noReg, $params->tanggalperiksa, $dokterPoli->kd_sub_unit);
+                $kuota = $this->quotaDokter($params->tanggalperiksa, $dokterPoli->kd_sub_unit);
+                $dataRegistrasiNonJkn = $this->checkRegistrasiNonJkn($params->tanggalperiksa, $dokterPoli->kd_sub_unit); // Offline
+                $dataRegistrasiJkn = $this->checkRegistrasiJkn($params->tanggalperiksa, $dokterPoli->kd_sub_unit); // Online
 
                 $res['code'] = 200;
-                $res['nomorantrean'] = $nomorAntrian;
-                $res['kodebooking'] = $noReg;
-                $res['jenisantrean'] = 2;
-                $res['estimasidilayani'] = $estimasidilayani;
+                $res['nomorantrean'] = "A-".$nomorAntrian;
+                $res['angkaantrean'] = $nomorAntrian;
+                $res['kodebooking'] = "BOOK".$noReg;
+                $res['norm'] = $dataPasien->no_rm;
                 $res['namapoli'] = $tarif->nama_sub_unit;
                 $res['namadokter'] = $dokterPoli->nama_pegawai;
+                $res['estimasidilayani'] = $estimasidilayani;
+                $res['sisakuotajkn'] = $kuota->kuota_jkn - $dataRegistrasiJkn;
+                $res['kuotajkn'] = $checkQuota->kuota_jkn;
+                $res['sisakuotanonjkn'] = $kuota->kuota_non_jkn - $dataRegistrasiNonJkn;
+                $res['kuotanonjkn'] = $kuota->kuota_non_jkn;
+                $res['keterangan'] = "Peserta harap 60 menit lebih awal gunakan pencatanan administrasi";
             }
             DB::commit();
             return $res;
@@ -333,6 +351,79 @@ class Antrian
                     ->first();
     }
 
+    private function quotaDokter($tanggalPeriksa, $kodeSubunit)
+    {
+
+        $dataQuotaDokter = DB::connection($this->dbsimrs)->table('jadwal_dokter_poli_rj')
+            ->select('jumlah_Kunjungan as kuota_non_jkn', 'jumlah_kunjungan_sms as kuota_jkn')
+            ->where([
+                ['kd_hari', '=', Waktu::tanggalToNilai($tanggalPeriksa)],
+                ['kd_sub_unit', '=', $kodeSubunit]
+            ])
+            ->first();
+        return $dataQuotaDokter;
+    }
+
+    private function checkQuota($tanggalPeriksa, $kodeSubunit)
+    {
+        $quotaSementara = DB::connection($this->dbsimrs)->table('kuota_registrasi_sms')
+                            ->select('kuota as kuota_jkn')
+                            ->where([
+                                ['tanggal', '=', $tanggalPeriksa],
+                                ['kd_sub_unit', '=', $kodeSubunit]
+                            ])
+                            ->first();
+
+        if (!$quotaSementara == NULL) {
+            $dataQuota = $quotaSementara;
+        } else {
+
+            $dataQuotaDokter = DB::connection($this->dbsimrs)->table('jadwal_dokter_poli_rj')
+                ->select('jumlah_Kunjungan_sms as kuota_jkn')
+                ->where([
+                    ['kd_hari', '=', Waktu::tanggalToNilai($tanggalPeriksa)],
+                    ['kd_sub_unit', '=', $kodeSubunit]
+                ])
+                ->first();
+
+            $dataQuota = $dataQuotaDokter;
+        }
+
+        return $dataQuota;
+    }
+
+    private function checkRegistrasiJkn($tanggalPeriksa, $kodeSubunit)
+    {
+        $nomorAntrian = DB::connection($this->dbsimrs)->table('registrasi as r')
+                        ->join('rawat_jalan as rj', function($join) {
+                            $join->on('r.no_reg','=', 'rj.no_reg');
+                        })
+                        ->select('rj.reg_sms')
+                        ->where('rj.kd_poliklinik', '=', $kodeSubunit)
+                        ->where('r.tgl_reg', '=', $tanggalPeriksa)
+                        ->whereIn('rj.reg_sms', ['1', '2', '3'])
+                        ->get();
+
+        $nomorAntrian = $nomorAntrian->count();
+        return $nomorAntrian;
+    }
+
+    private function checkRegistrasiNonJkn($tanggalPeriksa, $kodeSubunit)
+    {
+        $nomorAntrian = DB::connection($this->dbsimrs)->table('registrasi as r')
+            ->join('rawat_jalan as rj', function($join) {
+                $join->on('r.no_reg','=', 'rj.no_reg');
+            })
+            ->select('rj.reg_sms')
+            ->where('rj.kd_poliklinik', '=', $kodeSubunit)
+            ->where('r.tgl_reg', '=', $tanggalPeriksa)
+            ->whereNotIn('rj.reg_sms', ['1', '2', '3'])
+            ->get();
+
+            $nomorAntrian = $nomorAntrian->count();
+            return $nomorAntrian;
+    }
+
     private function getEstimasi($tanggal)
     {
         $estimasi = $tanggal." 00:05:00";
@@ -402,11 +493,10 @@ class Antrian
 
     private function getKodePenjamin($nomorKartu, $tanggal)
     {
-        $serviceBPjS = new Bridging(config('bpjs.api.consid'), BPJSHelper::timestamp(), BPJSHelper::signature(config('bpjs.api.consid'), config('bpjs.api.seckey')));
+        $serviceBPjS = new Bridging();
         $endpoint = 'Peserta/nokartu/'. $nomorKartu . "/tglSEP/" . $tanggal;
         $result = json_decode($serviceBPjS->getRequest($endpoint));
-        dd($result);
-        if ($result->response != null) {
+        if (isset($result->response->peserta)) {
             $jenisPeserta = $result->response->peserta->jenisPeserta->keterangan;
             $pecah = explode(" ", $jenisPeserta);
             $search = array_search("PBI", $pecah);
@@ -418,6 +508,24 @@ class Antrian
             $kodePenjamin = $kodePenjamin;
         }
         return $kodePenjamin;
+    }
+
+    protected function responseBpjs($dataJson)
+    {
+        if ($dataJson->metaData->code == "200") {
+            // dd(BPJSHelper::stringEncrtypt($this->key, json_encode($dataJson->metaData)));
+            return $this->decomporessed($dataJson->metaData, $dataJson->response);
+        }
+        return json_encode($dataJson);
+    }
+
+    protected function decomporessed($metadata, $response)
+    {
+        // return BPJSHelper::stringDecrypt($this->key, $response);
+        return [
+            $metadata,
+            json_decode(BPJSHelper::decompress(BPJSHelper::stringDecrypt($this->key, $response)), true)
+        ];
     }
 
     private function generateNomor($tglReg)
@@ -464,7 +572,7 @@ class Antrian
 
     private function getDokterPoli($kodePoli, $tanggal)
     {
-        $jadwalDokter = DB::connection($this->dbsimrs)->table('jadwal_dokter_poli_rj as j')
+        $jadwaDokter = DB::connection($this->dbsimrs)->table('jadwal_dokter_poli_rj as j')
                 ->select('j.kd_sub_unit','j.kd_pegawai', 'p.nama_pegawai')
                 ->join('sub_unit as s', 'j.kd_sub_unit', '=', 's.kd_sub_unit')
                 ->join('pegawai as p', 'j.kd_pegawai', '=', 'p.kd_pegawai')
@@ -474,8 +582,8 @@ class Antrian
                 ])
                 ->first();
 
-        if ($jadwalDokter) {
-            $dokterPengganti = $this->getDokterPengganti($jadwalDokter->kd_sub_unit, $tanggal);
+        if ($jadwaDokter) {
+            $dokterPengganti = $this->getDokterPengganti($jadwaDokter->kd_sub_unit, $tanggal);
             if (!is_null($dokterPengganti)) {
                 if ($dokterPengganti->status_pergantian == 0){
 
@@ -487,10 +595,10 @@ class Antrian
                     $res = null;
                 }
             } else {
-                $res = $jadwalDokter;
+                $res = $jadwaDokter;
             }
         } else {
-            $res =  $jadwalDokter;
+            $res =  $jadwaDokter;
         }
 
         return $res;

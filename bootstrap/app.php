@@ -81,6 +81,7 @@ $app->configure('filesystems');
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
+    'ssobpjs' => App\Http\Middleware\SsoBpjsMiddleware::class,
     'bpjs' => App\Http\Middleware\BpjsMiddleware::class,
     'bankjateng' => App\Http\Middleware\BankJatengMiddleware::class,
 ]);
@@ -119,6 +120,11 @@ $app->register(App\Providers\ResponseServiceProvider::class);
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
+    require __DIR__.'/../routes/apotik.php';
+    require __DIR__.'/../routes/antrian.php';
+    require __DIR__.'/../routes/bpjs.php';
+    require __DIR__.'/../routes/kemkes.php';
+    require __DIR__.'/../routes/simrs.php';
     require __DIR__.'/../routes/web.php';
 });
 

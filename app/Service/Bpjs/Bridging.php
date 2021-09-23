@@ -2,27 +2,32 @@
 
 namespace App\Service\Bpjs;
 
+use App\Generator\GeneratorBpjs;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\RequestException;
+use App\Http\Traits\Bpjs;
+use GuzzleHttp\Client;
 
-class Bridging extends Bpjs
+class Bridging
 {
+    use Bpjs;
 
-    protected $headers;
+    protected $client;
 
-    public function __construct($consid, $timestamp, $signature)
+    public function __construct()
     {
-        parent::__construct($consid, $timestamp, $signature);
-        $urlencode = array('Content-Type' => 'Application/x-www-form-urlencoded');
-        $this->headers = array_merge($this->header, $urlencode);
+        $this->client = new Client([
+            'verify' => true,
+            'cookie' => true
+        ]);
     }
 
     public function getRequest($endpoint)
     {
         try {
-            $url = $this->bpjs_url . $endpoint;
-            $response = $this->client->get($url, ['headers' => $this->header]);
-            $result = $response->getBody()->getContents();
+            $url = $this->setServiceApi() . $endpoint;
+            $response = $this->client->get($url, ['headers' => $this->setHeader()]);
+            $result = GeneratorBpjs::responseBpjsV2($response->getBody()->getContents(), $this->setKey());
             return $result;
         } catch (RequestException $e) {
             $result = Psr7\str($e->getRequest());
@@ -51,10 +56,10 @@ class Bridging extends Bpjs
     {
         $data = file_get_contents("php://input");
         try {
-            $url = $this->bpjs_url . $endpoint;
-            // dd($url, $data, $this->headers);
-            $result = $this->client->post($url, ['headers' => $this->headers, 'body' => $data]);
-            return $result->getBody();
+            $url = $this->setServiceApi() . $endpoint;
+            $response = $this->client->post($url, ['headers' => $this->setHeaders(), 'body' => $data]);
+			$result = GenerateBpjs::responseBpjsV2($response->getBody(), $this->key);
+            return $result();
         } catch (RequestException $e) {
             $result = Psr7\str($e->getRequest());
             if ($e->hasResponse()) {
@@ -67,9 +72,10 @@ class Bridging extends Bpjs
     {
         $data = file_get_contents("php://input");
         try {
-            $url = $this->bpjs_url . $endpoint;
-            $result = $this->client->put($url, ['headers' => $this->headers, 'body' => $data]);
-            return $result;
+            $url = $this->setServiceApi() . $endpoint;
+            $response = $this->client->post($url, ['headers' => $this->setHeaders(), 'body' => $data]);
+			$result = GenerateBpjs::responseBpjsV2($response->getBody(), $this->key);
+            return $result();
         } catch (RequestException $e) {
             $result = Psr7\str($e->getRequest());
             if ($e->hasResponse()) {
@@ -83,10 +89,10 @@ class Bridging extends Bpjs
         $data = file_get_contents("php://input");
         // dd($data, $this->header, $endpoint);
         try {
-            $url = $this->bpjs_url . $endpoint;
-            $result = $this->client->delete($url, ['headers' => $this->headers, 'body' => $data]);
-            $response = $result->getBody();
-            return $response;
+            $url = $this->setServiceApi() . $endpoint;
+            $response = $this->client->post($url, ['headers' => $this->setHeaders(), 'body' => $data]);
+			$result = GenerateBpjs::responseBpjsV2($response->getBody(), $this->key);
+            return $result();
         } catch (RequestException $e) {
             $result = Psr7\str($e->getRequest());
             if ($e->hasResponse()) {

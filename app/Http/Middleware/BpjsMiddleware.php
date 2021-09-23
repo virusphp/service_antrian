@@ -34,11 +34,12 @@ class BpjsMiddleware
             return response()->json('{"method":"OPTIONS"}', 200, $headers);
         }
 
-        if(!$request->hasHeader('X-Token')) {
+        if(!$request->hasHeader('x-Token')) {
             return response()->jsonApiBpjs(401, "Unautorized", ['messageError' => 'Need Token to Access this URL!']);
         }
 
-        $token = $request->header('X-Token');
+        $token = $request->header('x-Token');
+        
         $accessPlatform = $this->access->checkAccessApi($token);
         if (!$accessPlatform) {
             return response()->jsonApiBpjs(402, "Not Matching", "Token tidak sesuai");

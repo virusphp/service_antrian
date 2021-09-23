@@ -9,9 +9,6 @@ class Bpjs
     protected $client = null;
     protected $bpjs_url;
     protected $bpjs_url_sku;
-    // protected $consid;
-    // protected $timestamp;
-    // protected $signature;
     protected $header;
 
     public function __construct($consid, $timestamp, $signature)

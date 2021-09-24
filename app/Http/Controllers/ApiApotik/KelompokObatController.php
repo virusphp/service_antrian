@@ -19,7 +19,6 @@ class KelompokObatController extends Controller
     public function getKelompok(Request $r)
     {
         $kelompok = $this->kelompok->getKelompokObat($r);
-        // dd($kelompok);
         $transform = new KelompokObatCollection($kelompok);
         return response()->jsonApi(200, 'OK', $transform);
     }

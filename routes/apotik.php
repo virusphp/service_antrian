@@ -16,4 +16,8 @@ $router->group(['namespace'  => 'ApiApotik', 'prefix' => 'apotik'], function() u
     $router->post('/referensi/satuan', 'SatuanController@getSatuan');
     $router->post('/referensi/kelompok', 'KelompokObatController@getKelompok');
     $router->post('/referensi/jenisobat', 'JenisObatController@getJenisObat');
+    $router->post('/referensi/golonganobat', 'JenisObatController@getJenisObat');
+    $router->post('/referensi/pabrik', 'PabrikController@getPabrik');
+    $router->post('/referensi/generik', 'GenerikController@getGenerik');
+    $router->post('/referensi/barang', 'BarangFarmasiController@getBarang');
 });

@@ -15,6 +15,7 @@ class DokumenPasien
     {
         return DB::connection($this->dbsimrs)
                 ->table('pasien_file')
+                ->whereDate('tgl_created', Carbon::today())
                 ->where('id_file', 'like', $prefix . '%')
                 ->max('id_file');
     }
@@ -23,7 +24,10 @@ class DokumenPasien
     {
         // dd($params['id_file']);
         return DB::connection($this->dbsimrs)
-                    ->table('pasien_file')
+                    ->table('pasien_file as pf')
+                    ->select('pf.id_file','pf.no_rm','pf.no_reg','pf.kd_jenis_file','pf.file_pasien','pf.tgl_created',
+                            'pf.user_created','p.nama_pegawai')
+                    ->join('pegawai as p', 'pf.user_created','p.kd_pegawai')
                     ->where('id_file', $idFile)
                     ->first();
     }
@@ -40,7 +44,6 @@ class DokumenPasien
                                 'file_pasien' => $params['file_pasien'],
                                 'tgl_created' => Carbon::now(),
                                 'user_created' => $params['kode_pegawai']
-
                             ]);
             if ($dokumenPasien) {
                 $dokumenPasien = DB::connection($this->dbsimrs)->table('pasien_file')

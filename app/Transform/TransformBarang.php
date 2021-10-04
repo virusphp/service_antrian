@@ -10,11 +10,10 @@ class TransformBarang
     {
         foreach($table as $key => $value)
         {
-            // dd($value->nama_barang, $value->kd_jns_obat);
             $data[$key] = [
                 'idx_barang' => $value->idx_barang,
                 'kode_barang' => $value->kd_barang,
-                'nama_barang' => $value->nama_barang,
+                'nama_barang' => trim($value->nama_barang),
                 'kode_jenis_obat' => $value->kd_jns_obat,
                 'kode_satuan_besar' => $value->kd_satuan_kecil,
                 'isi_satuan_besar' => $value->isi_satuan_besar,

@@ -85,6 +85,7 @@ class DokumenPasienController extends Controller
     public function showDokumen($idFile)
     {
         $checkData = $this->dokumenPasien->checkData($idFile);
+        // dd($checkData);
         if (!$checkData) {
             return response()->jsonSimrs(201, "Data tidak di temukan!!");
         }
@@ -104,7 +105,6 @@ class DokumenPasienController extends Controller
         if (!$checkData) {
             return response()->jsonSimrs(201, "Data tidak di temukan!!");
         }
-        dd($checkData);
 
         $this->deleteImage($checkData->no_rm, $checkData->file_pasien); 
         $dokumenPasien = $this->dokumenPasien->deleteDokumen($r->id_file);

@@ -26,7 +26,7 @@ class DokumenResource extends JsonResource
                 'nama_file'       => $this->file_pasien,
                 'path_file'       => $file,
                 'tanggal_created' => $this->tgl_created,
-                'user_created'    => $this->user_created
+                'user_created'    => $this->nama_pegawai
         ];
     }
 }

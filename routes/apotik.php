@@ -20,4 +20,6 @@ $router->group(['namespace'  => 'ApiApotik', 'prefix' => 'apotik'], function() u
     $router->post('/referensi/pabrik', 'PabrikController@getPabrik');
     $router->post('/referensi/generik', 'GenerikController@getGenerik');
     $router->post('/referensi/barang', 'BarangFarmasiController@getBarang');
+    $router->post('/referensi/suplier', 'SuplierController@getSuplier');
+    $router->post('/referensi/unit', 'UnitBagianController@getUnit');
 });

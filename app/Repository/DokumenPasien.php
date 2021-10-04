@@ -22,7 +22,6 @@ class DokumenPasien
 
     public function checkData($idFile)
     {
-        // dd($params['id_file']);
         return DB::connection($this->dbsimrs)
                     ->table('pasien_file as pf')
                     ->select('pf.id_file','pf.no_rm','pf.no_reg','pf.kd_jenis_file','pf.file_pasien','pf.tgl_created',
@@ -75,8 +74,12 @@ class DokumenPasien
 
                             ]);
             if ($dokumenPasien) {
-                $dokumenPasien = DB::connection($this->dbsimrs)->table('pasien_file')
-                                ->where('id_file', $params['id_file'])->first();
+                $dokumenPasien = DB::connection($this->dbsimrs) ->table('pasien_file as pf')
+                    ->select('pf.id_file','pf.no_rm','pf.no_reg','pf.kd_jenis_file','pf.file_pasien','pf.tgl_created',
+                            'pf.user_created','p.nama_pegawai')
+                    ->join('pegawai as p', 'pf.user_created','p.kd_pegawai')
+                    ->where('id_file', $params['id_file'])
+                    ->first();
                 return $dokumenPasien;
             }
         } catch (Exception $e) {

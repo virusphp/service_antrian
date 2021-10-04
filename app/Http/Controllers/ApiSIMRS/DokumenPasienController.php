@@ -9,7 +9,7 @@ use App\Service\Simrs\ServiceDokumenPasien;
 use App\Validation\DokumenPasien;
 use App\Validation\UpdateDokumenPasien;
 use Illuminate\Http\Request;
-use File;
+use Illuminate\Support\Facades\File;
 
 class DokumenPasienController extends Controller
 {
@@ -21,7 +21,6 @@ class DokumenPasienController extends Controller
        $this->dokumenPasien = new AppDokumenPasien;
        $this->serviceDokumenPasien = new ServiceDokumenPasien;
     }
-
     /**
      * Simpan Dokumen
      */
@@ -107,6 +106,7 @@ class DokumenPasienController extends Controller
         }
 
         $this->deleteImage($checkData->no_rm, $checkData->file_pasien); 
+
         $dokumenPasien = $this->dokumenPasien->deleteDokumen($r->id_file);
 
         if (!$dokumenPasien) {

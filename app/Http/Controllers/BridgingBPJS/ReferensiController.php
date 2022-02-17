@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\BridgingBPJS;
 
-use App\Service\Bpjs\Bridging;
+use Vclaim\Bridging\BridgingBpjs;
 
 class ReferensiController
 {
-    protected $briding;
+    protected $bridging;
 
     public function __construct()
     {
-        $this->bridging = new Bridging();
+        $this->bridging = new BridgingBpjs;
     }
 
     public function diagnosa($kode)
@@ -21,129 +21,93 @@ class ReferensiController
     }
 
     public function poli($kode)
-    {
+    { 
         $endpoint = "referensi/poli/" . $kode;
-        $poli = $this->bpjs->getRequest($endpoint);
-        $result = json_decode($poli);
-        if ($result->metaData->code == "200" && !isset($result->response->poli)) {
-            return $this->responseBpjs($result);
-        }
-        return json_encode($result);
+        $poli = $this->bridging->getRequest($endpoint);
+        return $poli;
     }
 
     public function faskes($kodeNama, $jenisFaskes)
     {
         $endpoint = "referensi/faskes/" . $kodeNama . "/" . $jenisFaskes;
-        $faskes = $this->bpjs->getRequest($endpoint);
-        $result = json_decode($faskes);
-        if ($result->metaData->code == "200" && !isset($result->response->faskes)) {
-            return $this->responseBpjs($result);
-        }
-        return json_encode($result);
+        $faskes = $this->bridging->getRequest($endpoint);
+        return $faskes;
     }
 
     public function dpjp($jnsPel, $tglPel, $subSpesial)
     {
         $endpoint = "referensi/dokter/pelayanan/" . $jnsPel . "/tglPelayanan/" . $tglPel. "/Spesialis/". $subSpesial;
-        $dpjp = $this->bpjs->getRequest($endpoint);
-        $result = json_decode($dpjp);
-        if ($result->metaData->code == "200" && !isset($result->response->list)) {
-            return $this->responseBpjs($result);
-        }
-        return json_encode($result);
+        $dpjp = $this->bridging->getRequest($endpoint);
+        return $dpjp;
     }
 
     public function propinsi()
     {
         $endpoint = "referensi/propinsi";
-        $propinsi = $this->bpjs->getRequest($endpoint);
-        $result = json_decode($propinsi);
-        if ($result->metaData->code == "200" && !isset($result->response->list)) {
-            return $this->responseBpjs($result);
-        }
-        return json_encode($result);
+        $propinsi = $this->briding->getRequest($endpoint);
+        return $propinsi;
     }
 
     public function kabupaten($kodePropinsi)
     {
         $endpoint = "referensi/kabupaten/propinsi/" . $kodePropinsi;
-        $kabupaten = $this->bpjs->getRequest($endpoint);
-        $result = json_decode($kabupaten);
-        if ($result->metaData->code == "200" && !isset($result->response->list)) {
-            return $this->responseBpjs($result);
-        }
-        return json_encode($result);
+        $kabupaten = $this->bridging->getRequest($endpoint);
+        return $kabupaten;
     }
 
     public function kecamatan($kodeKabupaten)
     {
         $endpoint = "referensi/kecamatan/kabupaten/" . $kodeKabupaten;
-        $kecamatan = $this->bpjs->getRequest($endpoint);
-        $result = json_decode($kecamatan);
-        if ($result->metaData->code == "200" && !isset($result->response->list)) {
-            return $this->responseBpjs($result);
-        }
-        return json_encode($result);
+        $kecamatan = $this->bridging->getRequest($endpoint);
+        return $kecamatan;
     }
 
     public function procedure($kodeNama)
     {
         $endpoint = "referensi/procedure/" . $kodeNama;
-        $procedure = $this->bpjs->getRequest($endpoint);
-        $result = json_decode($procedure);
-        if ($result->metaData->code == "200" && !isset($result->response->procedure)) {
-            return $this->responseBpjs($result);
-        }
-        return json_encode($result);
+        $procedure = $this->bridging->getRequest($endpoint);
+        return $procedure;
     }
 
     public function kelas()
     {
         $endpoint = "referensi/kelasrawat";
-        $kelas = $this->bpjs->getRequest($endpoint);
-        $result = json_decode($kelas);
-        if ($result->metaData->code == "200" && !isset($result->response->list)) {
-            return $this->responseBpjs($result);
-        }
-        return json_encode($result);
+        $kelas = $this->bridging->getRequest($endpoint);
+        return $kelas;
     }
 
     public function dokter($namaDokter)
     {
         $endpoint = "referensi/dokter/". $namaDokter;
-        $dokter = $this->bpjs->getRequest($endpoint);
-        $result = json_decode($dokter);
-        if ($result->metaData->code == "200" && !isset($result->response->list)) {
-            return $this->responseBpjs($result);
-        }
-        return json_encode($result);
+        $dokter = $this->bridging->getRequest($endpoint);
+        return $dokter;
     }
 
     public function spesialistik()
     {
         $endpoint = "referensi/spesialistik";
-        $spesialistik = $this->bpjs->getRequest($endpoint);
+        $spesialistik = $this->bridging->getRequest($endpoint);
         return $spesialistik;
     }
 
     public function ruang()
     {
         $endpoint = "referensi/ruangrawat";
-        $ruang = $this->bpjs->getRequest($endpoint);
+        $ruang = $this->bridging->getRequest($endpoint);
         return $ruang;
     }
 
     public function caraKeluar()
     {
         $endpoint = "referensi/carakeluar";
-        $caraKeluar = $this->bpjs->getRequest($endpoint);
+        $caraKeluar = $this->bridging->getRequest($endpoint);
         return $caraKeluar;
     }
 
     public function pascaPulang()
     {
         $endpoint = "referensi/pascapulang";
-        $pascaPulang = $this->bpjs->getRequest($endpoint);
+        $pascaPulang = $this->bridging->getRequest($endpoint);
         return $pascaPulang;
     }
 

@@ -13,9 +13,6 @@ class Bpjs
 
     public function __construct($consid, $timestamp, $signature)
     {
-        // $this->consid    = $consid;
-        // $this->timestamp = $timestamp;
-        // $this->signature = $signature;
         $this->bpjs_url = config('bpjs.api.endpoint');
         $this->bpjs_url_sku = config('bpjs.api.endpointsku');
         $this->client = new Client([

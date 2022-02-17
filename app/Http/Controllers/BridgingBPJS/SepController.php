@@ -7,18 +7,17 @@ use Illuminate\Http\Request;
 
 class SepController extends BpjsController
 {
-    protected $bpjs;
+    protected $bridging;
 
     public function __construct()
     {
-        parent::__construct();
-        $this->bpjs = new Bridging($this->consid, $this->timestamp, $this->signature);
+        $this->bridging = new BridgingBpjs;
     }
 
     public function CariSep($noSep)
     {
         $endpoint = "SEP/" . $noSep;
-        $sep = $this->bpjs->getRequest($endpoint);
+        $sep = $this->bridging->getRequest($endpoint);
         return $sep;
     }
 
@@ -26,7 +25,7 @@ class SepController extends BpjsController
     {
         $dataJson = json_encode($request->all());
         $endpoint = "SEP/1.1/insert"; 
-        $sep = $this->bpjs->postRequest($endpoint, $dataJson);
+        $sep = $this->bridging->postRequest($endpoint, $dataJson);
         return $sep;
     }
 
@@ -34,7 +33,7 @@ class SepController extends BpjsController
     {
         $dataJson = $request->all();
         $endpoint = "SEP/delete";
-        $sep = $this->bpjs->deleteRequest($endpoint, $dataJson);
+        $sep = $this->bridging->deleteRequest($endpoint, $dataJson);
         return $sep;
     }
 }

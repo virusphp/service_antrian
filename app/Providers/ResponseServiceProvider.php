@@ -21,7 +21,7 @@ class ResponseServiceProvider extends ServiceProvider
     {
         $factory->macro('jsonApi', function($code = 200, $message = '', $data = null) use ($factory) {
             $format = [
-                'metadata' => [
+                'metaData' => [
                     'code' => $code,
                     'message' => $message
                 ],
@@ -47,7 +47,7 @@ class ResponseServiceProvider extends ServiceProvider
 
         $factory->macro('jsonApiBpjs', function($code = 200, $message = '', $data = null) use ($factory) {
             $format = [
-                'metadata' => [
+                'metaData' => [
                     'code' => $code,
                     'message' => $message
                 ],

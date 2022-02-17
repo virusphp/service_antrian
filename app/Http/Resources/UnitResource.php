@@ -15,10 +15,8 @@ class UnitResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'bagian' => [
-                'kode_bagian'    => $this->kdbagian,
-                'nama_bagian'  => $this->nmbagian
-            ]
+            'kode_bagian'    => trim($this->kdbagian),
+            'nama_bagian'  => $this->nmbagian
         ];
     }
 }

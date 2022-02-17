@@ -4,15 +4,13 @@ namespace App\Http\Controllers\ApiSIMRS;
 
 use App\Http\Controllers\BridgingBPJS\BpjsController;
 use App\Repository\Pasien;
-use App\Service\Bpjs\Bridging;
-use Illuminate\Http\Request;
-use App\Traits\Bpjs\ServicePeserta;
 use App\Transform\TransformPasien;
+use Vclaim\Bridging\BridgingBpjs;
 
 class PasienController extends BpjsController
 {
     protected $pasien;
-    protected $bpjs;
+    protected $bridging;
     protected $transform;
 
     public function __construct()
@@ -20,7 +18,7 @@ class PasienController extends BpjsController
         parent::__construct();
         $this->pasien = new Pasien;
         $this->transform = new TransformPasien;
-         $this->bpjs = new Bridging($this->consid, $this->timestamp, $this->signature);
+        $this->bridging = new BridgingBpjs;
     }
 
     public function getBiodataPasien($noRm)
@@ -44,7 +42,7 @@ class PasienController extends BpjsController
     protected function handlePesertaBpjs($noKartu, $tanggal) 
     {
         $endpoint = 'Peserta/nokartu/'. $noKartu . "/tglSEP/" . $tanggal;
-        $peserta = $this->bpjs->getRequest($endpoint);
+        $peserta = $this->bridging->getRequest($endpoint);
         $peserta = json_decode($peserta);
         $peserta->status = $peserta->response->peserta->statusPeserta->keterangan;
         $peserta->jenis_peserta = $peserta->response->peserta->jenisPeserta->keterangan;

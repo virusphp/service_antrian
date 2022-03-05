@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\BridgingBPJS;
 
-use Vclaim\Bridging\BridgingBpjs;
+use Bpjs\Bridging\Vclaim\BridgeVclaim;
 
 class MonitoringController extends BpjsController
 {
@@ -10,7 +10,7 @@ class MonitoringController extends BpjsController
 
     public function __construct()
     {
-        $this->bridging = new BridgingBpjs;
+        $this->bridging = new BridgeVclaim;
     }
   
     public function Kunjungan($tglSep, $jnsPel)

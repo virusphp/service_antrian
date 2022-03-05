@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\BridgingBPJS;
 
-use App\Service\Bpjs\Bridging;
+use Bpjs\Bridging\Vclaim\BridgeVclaim;
 use Illuminate\Http\Request;
 
 class SepController extends BpjsController
@@ -11,7 +11,7 @@ class SepController extends BpjsController
 
     public function __construct()
     {
-        $this->bridging = new BridgingBpjs;
+        $this->bridging = new BridgeVclaim;
     }
 
     public function CariSep($noSep)

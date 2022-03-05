@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\BridgingBPJS;
 
-use Vclaim\Bridging\BridgingBpjs;
+use Bpjs\Bridging\Vclaim\BridgeVclaim;
 
 class ReferensiController
 {
@@ -10,7 +10,7 @@ class ReferensiController
 
     public function __construct()
     {
-        $this->bridging = new BridgingBpjs;
+        $this->bridging = new BridgeVclaim;
     }
 
     public function diagnosa($kode)

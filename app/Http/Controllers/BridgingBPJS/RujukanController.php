@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\BridgingBPJS;
 
+use Bpjs\Bridging\Vclaim\BridgeVclaim;
 use Illuminate\Http\Request;
-use Vclaim\Bridging\BridgingBpjs;
 
 class RujukanController extends BpjsController
 {
@@ -11,7 +11,7 @@ class RujukanController extends BpjsController
 
     public function __construct()
     {
-        $this->bridging = new BridgingBpjs;
+        $this->bridging = new BridgeVclaim;
     }
 
     public function RujukanPcare($noRujukan)

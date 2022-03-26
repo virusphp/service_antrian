@@ -39,7 +39,7 @@ class SepController extends BpjsController
 
     public function UpdatePlg(Request $request)
     {
-        $dataJson = json_encode($request->all());
+        $dataJson = $request->all();
         $endpoint = "SEP/2.0/updtglplg";
         $sep = $this->bridging->putRequest($endpoint, $dataJson);
         return $sep;

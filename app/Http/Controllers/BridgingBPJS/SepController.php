@@ -41,7 +41,6 @@ class SepController extends BpjsController
     {
         $dataJson = $request->all();
         $endpoint = "SEP/2.0/updtglplg";
-        dd($dataJson, $endpoint);
         $sep = $this->bridging->putRequest($endpoint, $dataJson);
         return $sep;
     }

@@ -53,6 +53,7 @@ $router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
     $router->post('/sep/insert', 'SepController@InsertSep');
     $router->get('/sep/{noSep}', 'SepController@CariSep');
     $router->delete('/sep/delete', 'SepController@DeleteSep');
+    $router->post('/sep/updtglplg', 'SepController@UpdatePlg');
 
     // ---------------------- Rujukan ---------------------------------//
     $router->delete('/rujukan/delete', 'RujukanController@DeleteRujukan');

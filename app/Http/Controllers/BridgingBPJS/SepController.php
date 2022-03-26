@@ -17,7 +17,7 @@ class SepController extends BpjsController
     public function CariSep($noSep)
     {
         $endpoint = "SEP/" . $noSep;
-        $sep = $this->bridging->getRequest($endpoint);
+        $sep = $this->bridging->getRequestSep($endpoint);
         return $sep;
     }
 
@@ -35,5 +35,12 @@ class SepController extends BpjsController
         $endpoint = "SEP/delete";
         $sep = $this->bridging->deleteRequest($endpoint, $dataJson);
         return $sep;
+    }
+
+    public function UpdatePlg(Request $request)
+    {
+        $dataJson = json_encode($request->all());
+        $endpoint = "Sep/updtglplg";
+        $sep = $this->bridging->putRequest($endpoint, $dataJson);
     }
 }

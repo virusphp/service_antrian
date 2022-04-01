@@ -17,7 +17,7 @@ class SepController extends BpjsController
     public function CariSep($noSep)
     {
         $endpoint = "SEP/" . $noSep;
-        $sep = $this->bridging->getRequestSep($endpoint);
+        $sep = $this->bridging->getRequestSep($endpoint); // Reuqest khusus sep
         return $sep;
     }
 

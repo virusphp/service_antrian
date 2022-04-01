@@ -23,6 +23,11 @@ class Perubahan
         return date('Y-m-d', strtotime($nilai));
     }
 
+    public static function tanggalIndo($nilai)
+    {
+        return date('d-m-Y', strtotime($nilai));
+    }
+
     public static function jenis_rawat($nilai)
     {
         $hasil = substr($nilai,0,2);
@@ -35,5 +40,45 @@ class Perubahan
         }else{
             return "LB";
         }
+    }
+
+    public static function jenis_rawat2($nilai)
+    {
+        $hasil = substr($nilai,0,2);
+        if($hasil=='01'){
+            return "Pemeriksaan atau Tindakan Rawat Jalan";
+        }else if($hasil=='02'){
+            return "Pemeriksaan atau Tindakan Rawat Inap";
+        }else if($hasil=='03'){
+           return "Pemeriksaan atau Tindakan Rawat Darurat";
+        }else{
+            return "Pemeriksaan Laboratorium";
+        }
+    }
+
+    public static function ribuan($nilai)
+    {
+        return number_format($nilai, "2",",",".");
+    }
+
+    function array_group($key, $data) {
+        $result = array();
+    
+        foreach($data as $val) {
+            if(array_key_exists($key, $val)){
+                $result[$val[$key]][] = $val;
+            }else{
+                $result[""][] = $val;
+            }
+        }
+    
+        return $result;
+    }
+
+    public static function round_up($value, $places) {
+        $mult = 100;
+        return $places < 0 ?
+            ceil($value / $mult) * $mult :
+            ceil($value * $mult) / $mult;
     }
 }

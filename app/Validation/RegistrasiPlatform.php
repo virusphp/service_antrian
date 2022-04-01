@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 
 namespace App\Validation;
@@ -34,4 +35,36 @@ class RegistrasiPlatform
         return $error;
         
     }
+=======
+<?php
+
+namespace App\Validation;
+
+use Illuminate\Support\Facades\Validator;
+
+class RegistrasiPlatform
+{
+    public function rules($request)
+    {
+        return Validator::make($request->all(),[
+            'name' => 'required',
+            'username' => 'required|min:5|unique:access_platform,username',
+            'email' => 'required|min:5|unique:access_platform,email',
+            'password' => 'required',
+            'repassword' => 'required|same:password|min:6',
+            'phone' => 'required|min:10',
+        ]);
+    }
+
+    public function messages($errors)
+    {
+        $error = [];
+        foreach($errors->getMessages() as $key => $value)
+        {
+                $error[$key] = $value[0];
+        }
+        return $error;
+        
+    }
+>>>>>>> af0453c07bd5b1ca28aea1665f1a2fec9adf0e26
 }

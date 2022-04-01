@@ -53,4 +53,10 @@ class Waktu
 
         return $res;
     }
+
+    public static function tanggalInsert()
+    {
+        $date = date('Y-m-d H:i:s');
+        return $date;
+    }
 }

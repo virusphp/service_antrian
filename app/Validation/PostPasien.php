@@ -10,10 +10,10 @@ class PostPasien
     {
         return Validator::make($request->all(),[
             'no_rm' => 'required', 
-            'tanggal_tagihan' => 'required|date'         
+            // 'tanggal_registrasi' => 'required|date'         
         ],[
             'required' => 'Tidak boleh kosong atau NULL!',
-            'date'     => 'Tidak sesuai tanggal NASIONAl!',
+            // 'date'     => 'Tidak sesuai tanggal NASIONAl!',
         ]);
     }
 

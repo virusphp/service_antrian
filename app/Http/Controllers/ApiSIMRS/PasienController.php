@@ -5,7 +5,7 @@ namespace App\Http\Controllers\ApiSIMRS;
 use App\Http\Controllers\BridgingBPJS\BpjsController;
 use App\Repository\Pasien;
 use App\Transform\TransformPasien;
-use Vclaim\Bridging\BridgingBpjs;
+use Bpjs\Bridging\Vclaim\BridgeVclaim;
 
 class PasienController extends BpjsController
 {
@@ -18,7 +18,7 @@ class PasienController extends BpjsController
         parent::__construct();
         $this->pasien = new Pasien;
         $this->transform = new TransformPasien;
-        $this->bridging = new BridgingBpjs;
+        $this->bridging = new BridgeVclaim;
     }
 
     public function getBiodataPasien($noRm)

@@ -24,7 +24,7 @@ class SepController extends BpjsController
     public function InsertSep(Request $request)
     {
         $dataJson = json_encode($request->all());
-        $endpoint = "SEP/1.1/insert"; 
+        $endpoint = "SEP/2.0/insert"; 
         $sep = $this->bridging->postRequest($endpoint, $dataJson);
         return $sep;
     }
@@ -32,7 +32,8 @@ class SepController extends BpjsController
     public function DeleteSep(Request $request)
     {
         $dataJson = $request->all();
-        $endpoint = "SEP/delete";
+        $endpoint = "SEP/2.0/delete";
+        // dd($endpoint);
         $sep = $this->bridging->deleteRequest($endpoint, $dataJson);
         return $sep;
     }

@@ -28,6 +28,13 @@ class RujukanController extends BpjsController
         return $rujukanRs;
     }
 
+    public function jumlahSep($jnsRujukan, $noRujukan)
+    {
+        $endpoint = "Rujukan/JumlahSEP/" . $jnsRujukan . "/" . $noRujukan;
+        $rujukansep = $this->bridging->getRequest($endpoint);
+        return $rujukansep;
+    }
+
     public function PesertaPcare($noKartu)
     {
         $endpoint = "Rujukan/Peserta/" . $noKartu;

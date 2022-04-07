@@ -16,25 +16,30 @@ class RujukanInternalController extends Controller
     public function __construct()
     {
         $this->serviceRujukan = new ServiceRujukanInternal;
-        // $this->rujukanInternal = new 
+        // $this->rujukanInternal = new
     }
 
-    public function getRujukanInternal(Request $r, RujukanInternal $valid)
+
+    public function getRujukanInternal($code)
+    {
+        $getdatarujukaninternal = $this->serviceRujukan->getrujukanbycode($code);
+    }
+
+    public function getRujukanInternalOld(Request $r, RujukanInternal $valid)
     {
         $validate = $valid->rules($r);
 
         if ($validate->fails()) {
             $message = $valid->messages($validate->errors());
-            return response()->jsonSimrs(422, implode(",",$message));    
+            return response()->jsonSimrs(422, implode(",", $message));
         }
-        
+
         $rujukanInternal = $this->serviceRujukan->handleRujukanInternal($r);
 
         if (!$rujukanInternal) {
             return response()->jsonSimrs(201, "Terjadi kesalahan data input masih salah");
         }
 
-         return response()->jsonSimrs(200, "Sukses", $rujukanInternal);
+        return response()->jsonSimrs(200, "Sukses", $rujukanInternal);
     }
-
 }

@@ -12,16 +12,16 @@
 */
 
 // -------------------------- API SIMRS
-$router->group(['namespace'  => 'ApiSIMRS'], function() use ($router) {
-    // API  UNTUK ANDROID 
-    $router->group(['namespace' => 'Android'], function() use ($router) {
+$router->group(['namespace'  => 'ApiSIMRS'], function () use ($router) {
+    // API  UNTUK ANDROID
+    $router->group(['namespace' => 'Android'], function () use ($router) {
         $router->post('/registrasi/user/pasien', 'RegistrasiAndroidController@registrasiAndroid');
         $router->post('/login/user/pasien', 'LoginAndroidController@loginAndroid');
 
         $router->get('/list/poliklinik', 'TarifPoliklinikController@getListPoli');
         $router->get('/tarif/poliklinik/{kodePoli}', 'TarifPoliklinikController@getTarifPoli');
     });
-    
+
     //  TEMPAT TIDUR
     $router->get('/list/tempattidur/kemkes', 'KamarController@getListKamarKemkes');
     $router->get('/list/tempattidur/siranap', 'KamarController@getListKamarSiranap');
@@ -36,8 +36,10 @@ $router->group(['namespace'  => 'ApiSIMRS'], function() use ($router) {
     $router->get('/pasien/dokumen/show/{idFile}', 'DokumenPasienController@showDokumen');
 
     // API UNTUK APM ANJUNGAN MANDIRI
-    $router->group(['namespace' => 'Apm', 'prefix' => 'apm'], function() use ($router) {
+    $router->group(['namespace' => 'Apm', 'prefix' => 'apm'], function () use ($router) {
         $router->get('/data/registrasi/{noRm}', 'ApmController@dataRegistrasi');
-        $router->post('/rujukaninternal', 'RujukanInternalController@getRujukanInternal');
+        $router->get('/data/suratkontrol/{code}', 'ApmController@dataSuratKontrol');
+        $router->post('/sep/insert', 'ApmController@insertSep');
+        // $router->post('/rujukaninternal', 'RujukanInternalController@getRujukanInternal');
     });
 });

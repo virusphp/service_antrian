@@ -12,7 +12,7 @@
 */
 
 // ----------------------- API BPJS FOR INTERNAL
-$router->group(['namespace' => 'BridgingBPJS'], function() use ($router) {
+$router->group(['namespace' => 'BridgingBPJS'], function () use ($router) {
     // ----------------- REFERENSI --------------------------//
     $router->get('/referensi/diagnosa/{kode}', 'ReferensiController@diagnosa');
     $router->get('/referensi/poli/{kode}', 'ReferensiController@poli');

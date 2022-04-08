@@ -19,7 +19,7 @@ class ApmController extends Controller
         $this->registrasi = new Registrasi;
         $this->antrian = new Antrian;
         $this->transform = new TransformRegistrasi;
-        $this->serviceBpjs = new AppSep;
+        $this->serviceBpjs = new repoSep;
     }
 
     public function dataRegistrasi($noRm)
@@ -53,18 +53,19 @@ class ApmController extends Controller
 
     public function insertSep(Request $request)
     {
-        $dataSep = $request->all();
-        $result = $this->serviceBpjs->insertSep($dataSep);
+        $requestSep = $request->all();
+        $result = $this->serviceBpjs->insertSep($requestSep);
         $res = json_decode($result);
+        $requestSep = json_decode($requestSep)->request->t_sep;
         if ($res->metaData->code == 200) {
-            if ($res->response->sep->peserta->noKartu == $params['no_kartu'] && $res->response->sep->peserta->noMr == $params['no_rm']) {
+            if ($res->response->sep->peserta->noKartu == $requestSep->noKartu && $res->response->sep->peserta->noMr == $requestSep->noMR) {
                 DB::beginTransaction();
                 try {
-                    $dataInsert = $this->handleRequestData($params, $res->response->sep->noSep);
+                    $dataInsert = $this->handleRequestData($requestSep, $res->response->sep->noSep);
                     // $dataInsert = $this->handleRequestData($params);
                     $this->simpanSep($dataInsert);
                     // dd($insert);
-                    $this->simpanRujukan($params, $dataInsert);
+                    $this->simpanRujukan($requestSep, $dataInsert);
 
                     // $this->serviceTask->sendTask(json_encode($dataInsert["task"]));
                     DB::commit();

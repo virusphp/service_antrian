@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Repository\Antrian;
 use App\Repository\Registrasi;
 use App\Transform\TransformRegistrasi;
+use Exception;
 
 class ApmController extends Controller
 {
     protected $registrasi;
     protected $antrian;
     protected $transform;
-    protected $serviceBpjs;
 
     public function __construct()
     {
@@ -51,6 +51,11 @@ class ApmController extends Controller
         return response()->jsonApi("200", "OK", $transform);
     }
 
+    public function jumlahSep($jnsRujukan, $noRujukan)
+    {
+       //
+    }
+
     public function insertSep(Request $request)
     {
         $requestSep = $request->all();
@@ -66,22 +71,11 @@ class ApmController extends Controller
                     $this->simpanSep($dataInsert);
                     // dd($insert);
                     $this->simpanRujukan($requestSep, $dataInsert);
-
-                    // $this->serviceTask->sendTask(json_encode($dataInsert["task"]));
-                    DB::commit();
-                    return $result;
-                } catch (\Illuminate\Database\QueryException $e) {
-                    DB::rollback();
-                    if ($e->getCode() == "23000") {
-                        return $result;
-                    }
+        
+                } catch (Exception $e) {
+                    return $e->getMessage();
                 }
-            } else {
-                $message = $this->getMessage($result);
-                return $message;
             }
-        } else {
-            return $result;
         }
     }
 }

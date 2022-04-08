@@ -39,6 +39,7 @@ $router->group(['namespace'  => 'ApiSIMRS'], function () use ($router) {
     $router->group(['namespace' => 'Apm', 'prefix' => 'apm'], function () use ($router) {
         $router->get('/data/registrasi/{noRm}', 'ApmController@dataRegistrasi');
         $router->get('/data/suratkontrol/{code}', 'ApmController@dataSuratKontrol');
+        $router->get('/rujukan/jumlahsep/{jnsRujukan}/{noRujukan}', 'ApmController@jumlahSep');
         $router->post('/sep/insert', 'ApmController@insertSep');
         // $router->post('/rujukaninternal', 'RujukanInternalController@getRujukanInternal');
     });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BridgingBPJS;
 
 use Bpjs\Bridging\Vclaim\BridgeVclaim;
+use Illuminate\Support\Facades\DB;
 
 class ReferensiController
 {
@@ -17,6 +18,10 @@ class ReferensiController
     {
         $endpoint = "referensi/diagnosa/". $kode;
         $diagnosa = $this->bridging->getRequest($endpoint);
+        $diagnosa = json_decode($diagnosa, true);
+        if ($diagnosa['metaData']['code'] == "200") {
+            DB::connection('sql_simrs')->table('diagnosa_bpjs')->upsert($diagnosa['response']['diagnosa'], ['kode']);
+        }
         return $diagnosa;
     }
 
@@ -44,7 +49,7 @@ class ReferensiController
     public function propinsi()
     {
         $endpoint = "referensi/propinsi";
-        $propinsi = $this->briding->getRequest($endpoint);
+        $propinsi = $this->bridging->getRequest($endpoint);
         return $propinsi;
     }
 

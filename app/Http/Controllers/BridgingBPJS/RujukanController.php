@@ -28,7 +28,7 @@ class RujukanController extends BpjsController
         return $rujukanRs;
     }
 
-    public function jumlahSep($jnsRujukan, $noRujukan)
+    public function getJumlahSep($jnsRujukan, $noRujukan)
     {
         $endpoint = "Rujukan/JumlahSEP/" . $jnsRujukan . "/" . $noRujukan;
         $rujukansep = $this->bridging->getRequest($endpoint);

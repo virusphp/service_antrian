@@ -42,6 +42,7 @@ $router->group(['namespace' => 'BridgingBPJS'], function () use ($router) {
     $router->get('/rujukan/rs/peserta/{noKartu}', 'RujukanController@PesertaRs');
     $router->get('/rujukan/list/peserta/{noKartu}', 'RujukanController@PesertaListPcare');
     $router->get('/rujukan/rs/list/peserta/{noKartu}', 'RujukanController@PesertaListRs');
+    $router->get('/rujukan/jumlahsep/{jnsRujukan}/{noRujukan}', 'RujukanController@getJumlahSep');
 
     // --------------------- Monitoring ----------------------------//
     $router->get('/monitoring/kunjungan/tanggal/{tglSep}/jnspelayanan/{jnsPel}', 'MonitoringController@Kunjungan');
@@ -54,6 +55,8 @@ $router->group(['namespace' => 'BridgingBPJS'], function () use ($router) {
     $router->get('/sep/{noSep}', 'SepController@CariSep');
     $router->delete('/sep/delete', 'SepController@DeleteSep');
     $router->post('/sep/updtglplg', 'SepController@UpdatePlg');
+
+    $router->get('/sep/internal/{noSep}', 'SepController@CariSepInternal');
 
     // ---------------------- Rujukan ---------------------------------//
     $router->delete('/rujukan/delete', 'RujukanController@DeleteRujukan');

@@ -21,6 +21,13 @@ class SepController extends BpjsController
         return $sep;
     }
 
+    public function CariSepInternal($noSep)
+    {
+        $endpoint = "SEP/Internal/" . $noSep;
+        $sep = $this->bridging->getRequestNew($endpoint); // Reuqest khusus sep
+        return $sep;
+    }
+
     public function InsertSep(Request $request)
     {
         $dataJson = json_encode($request->all());

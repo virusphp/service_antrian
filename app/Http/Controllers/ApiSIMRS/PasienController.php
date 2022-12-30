@@ -24,6 +24,7 @@ class PasienController extends BpjsController
     public function getBiodataPasien($noRm)
     {
         $biodataPasien = $this->pasien->getBiodataPasien($noRm);
+        // dd($biodataPasien);
 
         if (!$biodataPasien) {
             $error = [

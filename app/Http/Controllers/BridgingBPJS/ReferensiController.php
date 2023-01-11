@@ -39,6 +39,14 @@ class ReferensiController
         return $faskes;
     }
 
+    public function pcaredokter($start, $akhir)
+    {
+        $endpoint = "dokter/" . $start . "/" . $akhir;
+        $faskes = $this->bridging->getRequest($endpoint);
+        return $faskes;
+
+    }
+
     public function dpjp($jnsPel, $tglPel, $subSpesial)
     {
         $endpoint = "referensi/dokter/pelayanan/" . $jnsPel . "/tglPelayanan/" . $tglPel. "/Spesialis/". $subSpesial;

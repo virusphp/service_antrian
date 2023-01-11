@@ -56,6 +56,41 @@ class RujukanController extends BpjsController
         return $rujukanList;
     }
 
+    public function RujukanListKhusus($bulan, $tahun)
+    {
+        $endpoint = "Rujukan/Khusus/List/Bulan/{$bulan}/Tahun/{$tahun}";
+        $rujukanList = $this->bridging->getRequest($endpoint);
+        return $rujukanList;
+    }
+
+    public function RujukanListSpesialistik($ppkrujukan, $tglrujukan)
+    {
+        $endpoint = "Rujukan/ListSpesialistik/PPKRujukan/{$ppkrujukan}/TglRujukan/{$tglrujukan}";
+        $rujukanList = $this->bridging->getRequest($endpoint);
+        return $rujukanList;
+    }
+
+    public function RujukanListSarana($ppkrujukan)
+    {
+        $endpoint = "Rujukan/ListSarana/PPKRujukan/{$ppkrujukan}";
+        $rujukanList = $this->bridging->getRequest($endpoint);
+        return $rujukanList;
+    }
+
+    public function RujukanListKeluar($tglmulai, $tglakhir)
+    {
+        $endpoint = "Rujukan/Keluar/List/tglMulai/{$tglmulai}/tglAkhir/{$tglakhir}";
+        $rujukanList = $this->bridging->getRequest($endpoint);
+        return $rujukanList;
+    }
+
+    public function RujukanListKeluarByNoRujukan($norujukan)
+    {
+        $endpoint = "Rujukan/Keluar/{$norujukan}";
+        $rujukanList = $this->bridging->getRequest($endpoint);
+        return $rujukanList;
+    }
+
     public function PesertaListRs($noKartu)
     {
         $endpoint = "Rujukan/RS/List/Peserta/" . $noKartu;

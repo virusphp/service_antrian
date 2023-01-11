@@ -31,6 +31,9 @@ $router->group(['namespace' => 'BridgingBPJS'], function () use ($router) {
     $router->get('/referensi/carakeluar', 'ReferensiController@caraKeluar');
     $router->get('/referensi/pascapulang', 'ReferensiController@pascaPulang');
 
+    // PCARE
+    $router->get('/dokter/{start}/{akhir}', 'ReferensiController@pcaredokter');
+
     // -------------------- PESERTA -----------------------------//
     $router->get('/peserta/nokartu/{noKartu}/tglsep/{tglSep}', 'PesertaController@noKartu');
     $router->get('/peserta/nik/{nik}/tglsep/{tglSep}', 'PesertaController@noKtp');
@@ -43,12 +46,18 @@ $router->group(['namespace' => 'BridgingBPJS'], function () use ($router) {
     $router->get('/rujukan/list/peserta/{noKartu}', 'RujukanController@PesertaListPcare');
     $router->get('/rujukan/rs/list/peserta/{noKartu}', 'RujukanController@PesertaListRs');
     $router->get('/rujukan/jumlahsep/{jnsRujukan}/{noRujukan}', 'RujukanController@getJumlahSep');
+    $router->get('/rujukan/khusus/list/bulan/{bulan}/tahun/{tahun}', 'RujukanController@RujukanListKhusus');
+    $router->get('/rujukan/listspesialistik/ppkrujukan/{ppkrujukan}/tglrujukan/{tglrujukan}', 'RujukanController@RujukanListSpesialistik');
+    $router->get('/rujukan/listsarana/ppkrujukan/{ppkrujukan}', 'RujukanController@RujukanListSarana');
+    $router->get('/rujukan/ppkrujukan/{ppkrujukan}', 'RujukanController@RujukanListSarana');
+    $router->get('/rujukan/keluar/List/tglmulai/{tglmulai}/tglakhir/{tglakhir}', 'RujukanController@RujukanListKeluar');
+    $router->get('/rujukan/keluar/{norujukan}', 'RujukanController@RujukanListKeluarByNoKartu');
 
     // --------------------- Monitoring ----------------------------//
     $router->get('/monitoring/kunjungan/tanggal/{tglSep}/jnspelayanan/{jnsPel}', 'MonitoringController@Kunjungan');
     $router->get('/monitoring/klaim/tanggal/{tglPulang}/jnspelayanan/{jnsPel}/status/{status}', 'MonitoringController@Klaim');
     $router->get('/monitoring/historipelayanan/nokartu/{noKartu}/tglawal/{tglAwal}/tglakhir/{tglAkhir}', 'MonitoringController@History');
-    $router->get('/monitoring/jasaraharja/tglawal/{tglAwal}/tglakhir/{tglAkhir}', 'MonitoringController@JasaRaharja');
+    $router->get('/monitoring/jasaraharja/jnspelayanan/{jnsPel}/tglawal/{tglAwal}/tglakhir/{tglAkhir}', 'MonitoringController@JasaRaharja');
 
     // ---------------------- SEP ---------------------------------//
     $router->post('/sep/insert', 'SepController@InsertSep');
@@ -65,6 +74,7 @@ $router->group(['namespace' => 'BridgingBPJS'], function () use ($router) {
     $router->get('/rencanakontrol/jadwalpraktekdokter/jnskontrol/{jnsKontrol}/kodepoli/{kodePoli}/tglrencanakontrol/{tglKontrol}', 'RencanaKontrolController@DataDokter');
     $router->get('/rencanakontrol/listspesialistik/jnskontrol/{jnsKontrol}/nomor/{nomor}/tglrencanakontrol/{tglKontrol}', 'RencanaKontrolController@DataPoli');
     $router->get('/rencanakontrol/listrencanakontrol/tglawal/{tglAwal}/tglakhir/{tglAkhir}/filter/{filter}', 'RencanaKontrolController@DataSuratkontrol');
+    $router->get('/rencanakontrol/listrencanakontrol/bulan/{bulan}/tahun/{tahun}/nokartu/{nokartu}/filter/{filter}', 'RencanaKontrolController@DataSuratkontrolByKartu');
     $router->get('/rencanakontrol/nosuratkontrol/{noSurat}', 'RencanaKontrolController@CariSurat');
     $router->get('/rencanakontrol/nosep/{noSep}', 'RencanaKontrolController@CariSep');
     $router->post('/rencanakontrol/delete', 'RencanaKontrolController@DeleteSurat');

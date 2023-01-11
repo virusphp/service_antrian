@@ -35,6 +35,14 @@ class RencanaKontrolController extends BpjsController
         return $dataSurat;
     }
 
+    public function DataSuratkontrolByKartu($bulan, $tahun, $nokartu, $filter)
+    {
+        // dd($bulan, $tahun, $nokartu);
+        $endpoint = "RencanaKontrol/ListRencanaKontrol/Bulan/{$bulan}/Tahun/{$tahun}/NoKartu/{$nokartu}/filter/{$filter}";
+        $dataSurat = $this->bridging->getRequest($endpoint);
+        return $dataSurat;
+    }
+
     public function CariSurat($noSurat)
     {
         $endpoint = "RencanaKontrol/noSuratKontrol/" . $noSurat;

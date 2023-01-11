@@ -34,11 +34,10 @@ class MonitoringController extends BpjsController
         return $history;
     }
 
-    public function JasaRaharja($tglAwal, $tglAkhir)
+    public function JasaRaharja($jnsPel, $tglAwal, $tglAkhir)
     {
-        $endpoint = "monitoring/JasaRaharja/tglMulai/" . $tglAwal . "/tglAkhir/" . $tglAkhir;
+        $endpoint = "monitoring/JasaRaharja/JnsPelayanan/{$jnsPel}/tglAwal/{$tglAwal}/tglAkhir/{$tglAkhir}";
         $jasaRaharja = $this->bridging->getRequest($endpoint);
         return $jasaRaharja;
-
     }
 }
